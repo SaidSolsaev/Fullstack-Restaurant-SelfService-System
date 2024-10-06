@@ -1,13 +1,14 @@
 import React, {useEffect, useState} from 'react';
 import { View, Text, StyleSheet, ImageBackground, Button, TouchableOpacity, Image } from 'react-native'
-import { getRestaurantInfo } from '../services/api/getRestaurantInfo.js';
+import { getMenuItems, getRestaurantInfo } from '../services/api/getRestaurantInfo.js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 
 
 const HomeScreen = ({ navigation }) => {
     const [restaurant, setRestaurant] = useState(null);
-    console.log(restaurant)
+    const [products, setProducts] = useState(null);
+
     useEffect(() => {
         async function fetchRestaurantInfo() {
             try {
@@ -25,10 +26,20 @@ const HomeScreen = ({ navigation }) => {
             }
         }
 
+        async function fetchMenuItems() {
+            try {
+                const response = await getMenuItems();
+                setProducts(response)
+            } catch (error) {
+                console.error('Failed to fetch product info:', error);
+            }
+        }
+
         fetchRestaurantInfo();
+        fetchMenuItems();
     }, [])
 
-    if (!restaurant) {
+    if (!restaurant || !products) {
         return <Text>Loading...</Text>;
     }
     
@@ -44,7 +55,10 @@ const HomeScreen = ({ navigation }) => {
                 <Text style={styles.restaurantName}>{restaurant.name}</Text>
 
                 <View style={styles.buttonContainer}>
-                    <TouchableOpacity style={styles.button}>
+                    <TouchableOpacity 
+                        style={styles.button}
+                        onPress={() => navigation.navigate('Main', {products})}
+                    >
                         <Ionicons name="restaurant-outline" size={24} color="white" />
                         <Text style={styles.buttonText}>Dine In</Text>
                     </TouchableOpacity>
@@ -66,7 +80,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        width: '100%', // Pass på at bildet dekker hele bredden
+        width: '100%',
         height: '100%'
     },
     
@@ -89,7 +103,7 @@ const styles = StyleSheet.create({
     buttonContainer: {
         flexDirection: 'row',
         justifyContent: 'space-around',
-        width: '80%',
+        width: '100%',
     },
     
     button: {
