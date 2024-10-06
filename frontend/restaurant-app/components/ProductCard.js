@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { View, Text, Image, Button, StyleSheet } from 'react-native';
+import { View, Text, Image, Button, StyleSheet, Pressable } from 'react-native';
 import { CartContext } from '../context/CartContext'; // Kontekst for handlekurven
 import burger from "../assets/burger.png";
 import dessert from "../assets/dessert.png";
@@ -21,16 +21,20 @@ const ProductCard = ({ product }) => {
         exampleProduct = fries;
     }
 
+    const handleAddToCart = (product) => {
+        addToCart(product)
+        alert(product.name + " Added to cart!")
+    }
+
     return (
         <View style={styles.card}>
-            <Image source={exampleProduct} style={styles.image} resizeMode="contain"/>
+            <Image source={exampleProduct} style={styles.image} resizeMode="fill"/>
             <Text style={styles.name}>{product.name}</Text>
             <Text style={styles.price}>${product.price}</Text>
-            <Button 
-                title="Bestill"
-                onPress={() => addToCart(product)}
-                color="#FF6347"
-            />
+
+            <Pressable style={styles.addButton} onPress={() => handleAddToCart(product)}>
+                <Text style={{color: "#fff", fontSize: "20px"}}>Bestill</Text>
+            </Pressable>
         </View>
     );
 };
@@ -39,8 +43,8 @@ export default ProductCard;
 
 const styles = StyleSheet.create({
     card: {
-        width: '30%',  // Gjør hvert kort 30% av bredden for å få plass til 3 på én rad
-        aspectRatio: 1,  // Gjør kortet kvadratisk
+        width: '30%',
+        aspectRatio: 1,
         backgroundColor: '#fff',
         padding: 10,
         margin: 10,
@@ -50,11 +54,18 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.3,
         shadowRadius: 2,
         elevation: 5,
-        justifyContent: 'space-between',  // Sørg for at innholdet fordeles jevnt
+        justifyContent: 'space-between',
+    },
+    addButton: {
+        width: '100%',
+        padding: 10,
+        backgroundColor: "#FF6347",
+        alignItems: "center",
+        borderRadius: 5,
     },
     image: {
         width: '100%',
-        height: '60%',  // Gir bildet mesteparten av plassen
+        height: '60%',
         borderRadius: 10,
     },
     name: {

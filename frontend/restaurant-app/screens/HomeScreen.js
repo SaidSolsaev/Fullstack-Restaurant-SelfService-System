@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import { View, Text, StyleSheet, ImageBackground, Button, TouchableOpacity, Image } from 'react-native'
+import { View, Text, StyleSheet, ImageBackground, Pressable } from 'react-native'
 import { getMenuItems, getRestaurantInfo } from '../services/api/getRestaurantInfo.js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
@@ -55,18 +55,18 @@ const HomeScreen = ({ navigation }) => {
                 <Text style={styles.restaurantName}>{restaurant.name}</Text>
 
                 <View style={styles.buttonContainer}>
-                    <TouchableOpacity 
+                    <Pressable 
                         style={styles.button}
                         onPress={() => navigation.navigate('Main', {products})}
                     >
                         <Ionicons name="restaurant-outline" size={24} color="white" />
                         <Text style={styles.buttonText}>Dine In</Text>
-                    </TouchableOpacity>
+                    </Pressable>
                  
-                    <TouchableOpacity style={styles.button}>
+                    <Pressable style={styles.button}>
                         <Ionicons name="fast-food-outline" size={24} color="white" />
                         <Text style={styles.buttonText}>Takeaway</Text>
-                    </TouchableOpacity>
+                    </Pressable>
                 </View>
             </View>
         </ImageBackground>

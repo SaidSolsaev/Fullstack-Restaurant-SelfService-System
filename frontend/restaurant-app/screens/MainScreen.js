@@ -1,5 +1,5 @@
 import React, {useRef, useState} from 'react'
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-native'
+import { View, Text, ScrollView, StyleSheet, Pressable } from 'react-native'
 import ProductCard from '../components/ProductCard'
 import ScrollHelper from '../components/ScrollHelper'
 
@@ -27,7 +27,7 @@ const MainScreen = ({ route }) => {
         <View style={styles.container}>
             {/* Kategori-knapper */}
             <View style={styles.categoryContainer}>
-            <TouchableOpacity
+                <Pressable
                     style={[
                         styles.categoryButton,
                         activeCategory === 'burgers' && styles.activeCategoryButton
@@ -42,9 +42,9 @@ const MainScreen = ({ route }) => {
                     >
                         Burgers
                     </Text>
-                </TouchableOpacity>
+                </Pressable>
 
-                <TouchableOpacity
+                <Pressable
                     style={[
                         styles.categoryButton,
                         activeCategory === 'sides' && styles.activeCategoryButton
@@ -59,9 +59,9 @@ const MainScreen = ({ route }) => {
                     >
                         Sides
                     </Text>
-                </TouchableOpacity>
+                </Pressable>
 
-                <TouchableOpacity
+                <Pressable
                     style={[
                         styles.categoryButton,
                         activeCategory === 'desserts' && styles.activeCategoryButton
@@ -76,9 +76,9 @@ const MainScreen = ({ route }) => {
                     >
                         Desserts
                     </Text>
-                </TouchableOpacity>
+                </Pressable>
 
-                <TouchableOpacity
+                <Pressable
                     style={[
                         styles.categoryButton,
                         activeCategory === 'drinks' && styles.activeCategoryButton
@@ -93,7 +93,7 @@ const MainScreen = ({ route }) => {
                     >
                         Drinks
                     </Text>
-                </TouchableOpacity>
+                </Pressable>
             </View>
 
             {/* Scrollable view for produktene */}

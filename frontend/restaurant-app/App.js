@@ -4,13 +4,13 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import HomeScreen from './screens/HomeScreen';
 import MenuScreen from './screens/MenuScreen';
-import { CartContext, CartProvider } from './context/CartContext';
+import { CartProvider } from './context/CartContext';
 import MainScreen from './screens/MainScreen';
 
 const {width, height} = Dimensions.get('window');
 
 const Stack = createNativeStackNavigator();
-console.log(width + "asdas");
+
 
 export default function App() {
   return (
