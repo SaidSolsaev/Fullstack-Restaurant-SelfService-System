@@ -1,137 +1,156 @@
-import React, {useRef, useState} from 'react'
-import { View, Text, ScrollView, StyleSheet, Pressable } from 'react-native'
+import React, {useRef, useState, useContext, useEffect} from 'react'
+import { View, Text, ScrollView, StyleSheet, Pressable, Dimensions, Platform, findNodeHandle } from 'react-native'
 import ProductCard from '../components/ProductCard'
 import ScrollHelper from '../components/ScrollHelper'
+import { CartContext } from '../context/CartContext'
+import { getCategories } from '../services/api/getRestaurantInfo'
+import Cart from '../components/Cart'
 
-const MainScreen = ({ route }) => {
+
+const MainScreen = ({ route, navigation }) => {
     const {products} = route.params || {};
     const scrollRef = useRef(null);
+    const burgerRef = useRef(null);
+    const sidesRef = useRef(null);
+    const dessertsRef = useRef(null);
+    const drinksRef = useRef(null);
     const [activeCategory, setActiveCategory] = useState('burgers');
+    const [categories, setCategories] = useState(null);
     
-    if (!products || products.length === 0) {
+    useEffect(() => {
+        async function fetchCategories() {
+            try {
+                const response = await getCategories();
+                
+                if(response){
+                    const drinksCategory = response.find(category => category.name === 'Drinks');
+                    const otherCategories = response.filter(category => category.name !== 'Drinks');
+                
+                    setCategories([...otherCategories, drinksCategory]);
+                }
+            } catch (error) {
+                console.error('Failed to fetch Category info:', error);
+            }
+        }
+        fetchCategories();
+    }, [])
+
+    
+    if (!products || products.length === 0 || !categories) {
         return <Text>No products available</Text>;
     }
 
+    const scrollToCategoryIOS = (category) => {
+        setActiveCategory(category);
+
+        let categoryRef;
+        switch (category) {
+            case 'burgers':
+                categoryRef  = burgerRef;
+                break;
+            case 'sides':
+                categoryRef  = sidesRef;
+                break;
+            case 'desserts':
+                categoryRef  = dessertsRef;
+                break;
+            case 'drinks':
+                categoryRef  = drinksRef;
+                break;
+            default:
+                return;
+        }
+
+        categoryRef.current.measureLayout(
+            findNodeHandle(scrollRef.current),
+            (x, y) => {
+                scrollRef.current.scrollTo({ y, animated: true });
+            }
+        )
+    };
+
     const handleCategoryPress = (category) => {
         setActiveCategory(category);
-        ScrollHelper.scrollToCategory(scrollRef, category);
+
+        if (Platform.OS === 'ios'){
+            scrollToCategoryIOS(category);
+        } else if(Platform.OS === 'web'){
+            ScrollHelper.scrollToCategory(scrollRef, category);
+        }
     }; 
 
-    const burgerProducts = products.filter(p => p.categoryId=== 1);
-    const sidesProducts = products.filter(p => p.categoryId === 4);
-    const dessertProducts = products.filter(p => p.categoryId === 3);
-    const drinkProducts = products.filter(p => p.categoryId === 2);
-
+    const burgerProducts = products.filter(p => p.Category.name === 'Burgers');
+    const sidesProducts = products.filter(p => p.Category.name === 'Sides');
+    const dessertProducts = products.filter(p => p.Category.name === 'Desserts');
+    const drinkProducts = products.filter(p => p.Category.name === 'Drinks');
 
     return (
         <View style={styles.container}>
-            {/* Kategori-knapper */}
-            <View style={styles.categoryContainer}>
-                <Pressable
-                    style={[
-                        styles.categoryButton,
-                        activeCategory === 'burgers' && styles.activeCategoryButton
-                    ]}
-                    onPress={() => handleCategoryPress('burgers')}
-                >
-                    <Text
-                        style={[
-                            styles.categoryText,
-                            activeCategory === 'burgers' && styles.activeCategoryText
-                        ]}
-                    >
-                        Burgers
-                    </Text>
-                </Pressable>
 
-                <Pressable
-                    style={[
-                        styles.categoryButton,
-                        activeCategory === 'sides' && styles.activeCategoryButton
-                    ]}
-                    onPress={() => handleCategoryPress('sides')}
-                >
-                    <Text
-                        style={[
-                            styles.categoryText,
-                            activeCategory === 'sides' && styles.activeCategoryText
-                        ]}
-                    >
-                        Sides
-                    </Text>
-                </Pressable>
+            <View style={styles.mainContainer}>
 
-                <Pressable
-                    style={[
-                        styles.categoryButton,
-                        activeCategory === 'desserts' && styles.activeCategoryButton
-                    ]}
-                    onPress={() => handleCategoryPress('desserts')}
-                >
-                    <Text
-                        style={[
-                            styles.categoryText,
-                            activeCategory === 'desserts' && styles.activeCategoryText
-                        ]}
-                    >
-                        Desserts
-                    </Text>
-                </Pressable>
+                {/* Categories */}
+                <View style={styles.categoryContainer}>
+                    {categories.map((category) => (
+                        <Pressable
+                            key={category.id}
+                            style={[
+                                styles.categoryButton,
+                                activeCategory === category.name.toLowerCase() && styles.activeCategoryButton
+                            ]}
+                            onPress={() => handleCategoryPress(category.name.toLowerCase())}
+                        >
+                            <Text
+                                style={[
+                                    styles.categoryText,
+                                    activeCategory === category.name.toLowerCase() && styles.activeCategoryText
+                                ]}
+                                > 
+                                {category.name}
+                            </Text>
+                        </Pressable>
+                    ))}
+                </View>
 
-                <Pressable
-                    style={[
-                        styles.categoryButton,
-                        activeCategory === 'drinks' && styles.activeCategoryButton
-                    ]}
-                    onPress={() => handleCategoryPress('drinks')}
-                >
-                    <Text
-                        style={[
-                            styles.categoryText,
-                            activeCategory === 'drinks' && styles.activeCategoryText
-                        ]}
-                    >
-                        Drinks
-                    </Text>
-                </Pressable>
+
+                {/* Menu Items */}
+                <View style={styles.productContainer}>
+                    <ScrollView ref={scrollRef} style={styles.scrollView} showsVerticalScrollIndicator={false}>
+                        <View>
+                            <Text ref={burgerRef} style={styles.categoryTitle} id="burgers">Burgers</Text>
+                            <View style={styles.cardContainer}>
+                                {burgerProducts.map(product => (
+                                    <ProductCard key={product.id} product={product} />
+                                ))}
+                            </View>
+
+                            <Text ref={sidesRef} style={styles.categoryTitle} id="sides">Sides</Text>
+                            <View style={styles.cardContainer}>
+                                {sidesProducts.map(product => (
+                                    <ProductCard key={product.id} product={product} />
+                                ))}
+                            </View>
+
+                            <Text ref={dessertsRef} style={styles.categoryTitle} id="desserts">Desserts</Text>
+                            <View style={styles.cardContainer}>
+                                {dessertProducts.map(product => (
+                                    <ProductCard key={product.id} product={product} />
+                                ))}
+                            </View>
+
+                            <Text ref={drinksRef} style={styles.categoryTitle} id="drinks">Drinks</Text>
+                            <View style={styles.cardContainer}>
+                                {drinkProducts.map(product => (
+                                    <ProductCard key={product.id} product={product} />
+                                ))}
+                            </View>
+                        </View>
+                    </ScrollView>
+                </View>
             </View>
 
-            {/* Scrollable view for produktene */}
-            <ScrollView ref={scrollRef} style={styles.scrollView}>
-                <View>
-                    {/* Burgers */}
-                    <Text style={styles.categoryTitle} id="burgers">Burgers</Text>
-                    <View style={styles.cardContainer}>
-                        {burgerProducts.map(product => (
-                            <ProductCard key={product.id} product={product} />
-                        ))}
-                    </View>
-
-                    {/* Sides */}
-                    <Text style={styles.categoryTitle} id="sides">Sides</Text>
-                    <View style={styles.cardContainer}>
-                        {sidesProducts.map(product => (
-                            <ProductCard key={product.id} product={product} />
-                        ))}
-                    </View>
-
-                    {/* Desserts */}
-                    <Text style={styles.categoryTitle} id="desserts">Desserts</Text>
-                    <View style={styles.cardContainer}>
-                        {dessertProducts.map(product => (
-                            <ProductCard key={product.id} product={product} />
-                        ))}
-                    </View>
-
-                    {/* Drinks */}
-                    <Text style={styles.categoryTitle} id="drinks">Drinks</Text>
-                    <View style={styles.cardContainer}>
-                        {drinkProducts.map(product => (
-                            <ProductCard key={product.id} product={product} />
-                        ))}
-                    </View>
-                </View>
-            </ScrollView>
+            {/* Cart */}
+            <Cart navigation={navigation}/>
         </View>
     )
 }
@@ -141,14 +160,14 @@ export default MainScreen
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        flexDirection: 'row',
         backgroundColor: '#FFEBCD',
-        padding: 10,
+        padding: 0,
     },
     categoryContainer: {
         flexDirection: 'row',
         justifyContent: 'center',
         marginBottom: 10,
-        // backgroundColor: '#FF6347',
         paddingVertical: 10,
         borderBottomWidth: 1,
         borderBottomColor: '#ddd',
@@ -156,7 +175,6 @@ const styles = StyleSheet.create({
     categoryButton: {
         paddingVertical: 10,
         paddingHorizontal: 20,
-        // backgroundColor: '#FF6347',
         borderRadius: 5,
         marginHorizontal: 5,
     },
@@ -173,8 +191,23 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: '#fff',
     },
+
+    mainContainer: {
+        flex: 1,
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        gap: 10
+    },
+    productContainer: {
+        flex: 2,
+        padding: 10,
+    },
     scrollView: {
         flex: 1,
+        ...(Platform.OS === 'web' && {
+            '::-webkit-scrollbar': { display: 'none' },
+            scrollbarWidth: 'none',
+        }),
     },
     categoryTitle: {
         fontSize: 24,
@@ -185,7 +218,7 @@ const styles = StyleSheet.create({
     cardContainer: {
         flexDirection: 'row',
         flexWrap: 'wrap',
-        justifyContent: 'space-between',  // For å fordele kortene jevnt over skjermen
+        justifyContent: 'space-between',
         padding: 5,
     },
 });

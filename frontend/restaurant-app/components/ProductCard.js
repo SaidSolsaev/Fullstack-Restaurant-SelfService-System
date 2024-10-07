@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { View, Text, Image, Button, StyleSheet, Pressable } from 'react-native';
+import { View, Text, Image, StyleSheet, Pressable, Dimensions } from 'react-native';
 import { CartContext } from '../context/CartContext'; // Kontekst for handlekurven
 import burger from "../assets/burger.png";
 import dessert from "../assets/dessert.png";
@@ -7,15 +7,17 @@ import drink from "../assets/drink.png";
 import fries from "../assets/fries.png";
 
 
+const { width } = Dimensions.get('window');
+
 const ProductCard = ({ product }) => {
     const { addToCart } = useContext(CartContext);
     let exampleProduct = null;
 
-    if (product.categoryId === 1){
+    if (product.Category.name === 'Burgers'){
         exampleProduct = burger;
-    } else if(product.categoryId === 2){
+    } else if(product.Category.name === 'Drinks'){
         exampleProduct = drink;
-    } else if(product.categoryId === 3){
+    } else if(product.Category.name === 'Desserts'){
         exampleProduct = dessert;
     }else {
         exampleProduct = fries;
@@ -23,17 +25,16 @@ const ProductCard = ({ product }) => {
 
     const handleAddToCart = (product) => {
         addToCart(product)
-        alert(product.name + " Added to cart!")
     }
 
     return (
         <View style={styles.card}>
-            <Image source={exampleProduct} style={styles.image} resizeMode="fill"/>
+            <Image source={exampleProduct} style={styles.image} resizeMode="contain"/>
             <Text style={styles.name}>{product.name}</Text>
             <Text style={styles.price}>${product.price}</Text>
 
             <Pressable style={styles.addButton} onPress={() => handleAddToCart(product)}>
-                <Text style={{color: "#fff", fontSize: "20px"}}>Bestill</Text>
+                <Text style={{color: "#fff", fontSize: 20}}>Bestill</Text>
             </Pressable>
         </View>
     );
@@ -43,11 +44,11 @@ export default ProductCard;
 
 const styles = StyleSheet.create({
     card: {
-        width: '30%',
+        flexBasis: width > 1200 ? '22%' : width > 800 ? '30%' : '45%',
         aspectRatio: 1,
         backgroundColor: '#fff',
-        padding: 10,
-        margin: 10,
+        padding: 16,
+        margin: 8,
         borderRadius: 10,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
@@ -58,14 +59,14 @@ const styles = StyleSheet.create({
     },
     addButton: {
         width: '100%',
-        padding: 10,
+        padding: 2,
         backgroundColor: "#FF6347",
         alignItems: "center",
         borderRadius: 5,
     },
     image: {
         width: '100%',
-        height: '60%',
+        height: '50%',
         borderRadius: 10,
     },
     name: {

@@ -17,9 +17,10 @@ const HomeScreen = ({ navigation }) => {
                     setRestaurant(JSON.parse(storedRestaurant));
                 } else{
                     const response = await getRestaurantInfo();
-                    setRestaurant(response);
-
-                    await AsyncStorage.setItem('restaurantInfo', JSON.stringify(response));
+                    if(response){
+                        setRestaurant(response);
+                        await AsyncStorage.setItem('restaurantInfo', JSON.stringify(response));
+                    }
                 }
             } catch (error) {
                 console.error('Failed to fetch restaurant info:', error);
@@ -29,7 +30,10 @@ const HomeScreen = ({ navigation }) => {
         async function fetchMenuItems() {
             try {
                 const response = await getMenuItems();
-                setProducts(response)
+                
+                if(response){
+                    setProducts(response)
+                }
             } catch (error) {
                 console.error('Failed to fetch product info:', error);
             }

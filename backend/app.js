@@ -11,6 +11,7 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import paymentRouter from './routes/paymentRoute.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -30,7 +31,7 @@ app.use('/api', categoryRoutes);
 app.use('/api', orderRoutes);
 app.use('/api', adminRoutes);
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
+app.use('/api/payment', paymentRouter);
 const PORT = 3000;
 
 sequelize.sync({force: false})

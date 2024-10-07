@@ -9,7 +9,25 @@ import path from 'path';
 
 export const getAllMenuItems = async(req, res) => {
     try {
-        const items = await MenuItem.findAll();
+        const { category } = req.query;
+        let whereCondition = {};
+
+        if (category) {
+            whereCondition = {
+                '$Category.name$': category
+            };
+        }
+
+        const items = await MenuItem.findAll({
+            include: [
+                {
+                    model: Category,
+                    attributes: ['name']
+                }
+            ],
+            where: whereCondition,
+        });
+        
         res.json(items);
     } catch (error) {
         res.status(500).json({ error: 'Failed to fetch Menu Items' });
