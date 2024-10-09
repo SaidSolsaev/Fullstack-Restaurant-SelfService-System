@@ -1,22 +1,33 @@
 import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Pressable } from 'react-native';
 
 const PaymentSuccessScreen = ({route}) => {
     const navigation = useNavigation();
-    
     const { order } = route.params;
-    
+    console.log(order);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            navigation.navigate('Home');
+        }, 15000);
+
+        return () => clearTimeout(timer);
+    }, [navigation]);
 
 
     return (
         <View style={styles.container}>
             <View style={styles.card}>
                 <Text style={styles.successText}>Payment Successful!</Text>
-                <Text style={styles.orderIdText}>Order ID: {order.orderId}</Text>
-                <Text style={styles.orderInfoText}>Total: ${order.totalPrice}</Text>
+                <Text style={styles.orderIdText}>Order ID: {order.orderNumber}</Text>
+                <Text style={styles.orderInfoText}>Total: ${order.totalAmount}</Text>
                 {/* Add more order information as needed */}
             </View>
+
+            <Pressable onPress={() => navigation.navigate('Home')} style={styles.button}>
+                <Text style={styles.buttonText}>Go to Home</Text>
+            </Pressable>
         </View>
     );
 };

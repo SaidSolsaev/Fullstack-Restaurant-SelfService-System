@@ -10,13 +10,9 @@ import Constants from "expo-constants";
 const PaymentScreen = ({ route }) => {
     const { phoneNumber } = route.params;
     const { getTotalPrice, cartItems } = useContext(CartContext);
-    let totalPrice = (10 * getTotalPrice()).toFixed(2);
     const navigation = useNavigation();
+    let totalPrice = (10 * getTotalPrice()).toFixed(2);
 
-    const paymentSuccess = route.params?.paymentSuccess;
-
-
-    
 
     useEffect(() => {
         const handleDeepLink = (event) => {
@@ -59,7 +55,7 @@ const PaymentScreen = ({ route }) => {
                 ? `http://localhost:8081/payment-processing?phoneNumber=${phoneNumber}&orderId=${orderId}`
                 : `exp://192.168.0.170:8081/--/payment-processing?phoneNumber=${phoneNumber}&orderId=${orderId}`;
 
-            const response = await fetch(`${Constants.manifest2.extra.NGROK_URL}/api/payment/start-payment`, {
+            const response = await fetch(`${Constants.expoConfig?.extra?.NGROK_URL}/api/payment/start-payment`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

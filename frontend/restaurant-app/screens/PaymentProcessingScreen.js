@@ -4,6 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import { createOrderBackendCall } from '../services/api/getRestaurantInfo';
 import { CartContext } from '../context/CartContext';
 import * as Linking from "expo-linking";
+import Constants from "expo-constants";
 
 
 const PaymentProcessingScreen = ({ route }) => {
@@ -49,7 +50,7 @@ const PaymentProcessingScreen = ({ route }) => {
     const handlePaymentCallback = async () => {
         try {
 
-            const paymentResponse = await fetch(`${Constants.manifest2.extra.NGROK_URL}/api/payment/callback`, {
+            const paymentResponse = await fetch(`${Constants.expoConfig?.extra?.NGROK_URL}/api/payment/callback`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
