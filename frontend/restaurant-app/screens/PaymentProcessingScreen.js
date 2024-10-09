@@ -80,7 +80,7 @@ const PaymentProcessingScreen = ({ route }) => {
                 }
             } else {
                 Alert.alert('Payment Failed', 'Your payment was not successful.');
-                navigation.navigate('PaymentFail', {paymentSuccess: false, phoneNumber});
+                navigation.navigate('Payment', {phoneNumber});
             }
         
         } catch (error) {

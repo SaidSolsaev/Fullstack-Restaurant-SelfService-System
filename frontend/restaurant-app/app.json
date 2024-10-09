@@ -9,7 +9,7 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "extra":{
-      "NGROK_URL": " https://miserably-clever-toucan.ngrok-free.app"
+      "NGROK_URL": "https://miserably-clever-toucan.ngrok-free.app"
     },
     "splash": {
       "image": "./assets/splash.png",

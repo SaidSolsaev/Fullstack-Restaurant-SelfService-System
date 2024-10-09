@@ -12,8 +12,7 @@ const PaymentScreen = ({ route }) => {
     const { getTotalPrice, cartItems } = useContext(CartContext);
     const navigation = useNavigation();
     let totalPrice = (10 * getTotalPrice()).toFixed(2);
-
-
+    
     useEffect(() => {
         const handleDeepLink = (event) => {
             const url = event.url;
