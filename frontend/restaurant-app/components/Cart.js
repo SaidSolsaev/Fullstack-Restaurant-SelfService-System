@@ -10,7 +10,9 @@ const Cart = ({navigation}) => {
     return (
         <View style={styles.cartContainer}>
             <View style={styles.cartTitleContainer}>
-                <Text style={styles.cartTitle}>Cart</Text>
+                <View>
+                    <MaterialIcons name="shopping-basket" size={50} color="#FF6347" />
+                </View>
             </View>
             
             <ScrollView style={styles.scrollview} showsVerticalScrollIndicator={false}>    
@@ -31,7 +33,7 @@ const Cart = ({navigation}) => {
                     
                 {cartItems.length > 0 && (
                     <Pressable onPress={() => navigation.navigate('Checkout')}>
-                        <MaterialIcons style={styles.cartButton} name="shopping-cart-checkout" size={24} color="#fff" />
+                        <MaterialIcons style={styles.cartButton} name="shopping-cart-checkout" size={24} color="white" />
                     </Pressable>
                 )}
             </View>
@@ -53,15 +55,14 @@ const styles = StyleSheet.create({
         
     },
     cartTitleContainer: {
-        paddingVertical: 20,
-        paddingHorizontal: 10,
+        paddingVertical: 6.8,
+        paddingHorizontal: 30,
         marginBottom: 10,
         borderBottomWidth: 1,
+        flexDirection: 'row',
         borderBottomColor: '#ddd',
-    },
-    cartTitle: {
-        fontSize: 18,
-        fontWeight: 'bold',
+        justifyContent: "flex-end",
+        alignItems: "center"
     },
     cartItemsContainer: {
         flex: 1,
@@ -80,7 +81,9 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
-        padding: 10
+        padding: 10,
+        borderTopWidth: 1,
+        borderTopColor: "#ddd",
     },
     totalPrice: {
         fontSize: 18,

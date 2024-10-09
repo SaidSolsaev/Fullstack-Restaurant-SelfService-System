@@ -5,6 +5,9 @@ import validator from 'validator';
 import { countryData } from '../assets/data/data';
 import CountryFlag from "react-native-country-flag";
 import ErrorComponent from '../components/ErrorComponent';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+
 
 const PhoneNumberScreen = ({ navigation }) => {
     const [phoneNumber, setPhoneNumber] = useState('');
@@ -14,7 +17,7 @@ const PhoneNumberScreen = ({ navigation }) => {
     const [showError, setShowError] = useState(false);
     const [errorKey, setErrorKey] = useState(0)
 
-    const testPhoneNumber = 95819642
+    const testPhoneNumber = '95819642';
 
     const filteredCountries = Object.keys(countryData).filter((key) =>
         countryData[key].name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -23,6 +26,7 @@ const PhoneNumberScreen = ({ navigation }) => {
     const handleNext = () => {
         
         const fullPhoneNumber = `${countryCode.dial_code}${phoneNumber}`;
+
         if (validator.isMobilePhone(fullPhoneNumber, countryCode.country_code)) {
             navigation.navigate('Payment', { phoneNumber: fullPhoneNumber });
         } else {
@@ -36,19 +40,17 @@ const PhoneNumberScreen = ({ navigation }) => {
         setModalVisible(false);
     };
 
-
+    
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Write Your Phone Number</Text>
-            
-            
-           
+
             <View style={styles.inputContainer}>
                 <TouchableOpacity 
                     style={styles.flagContainer} 
                     onPress={() => setModalVisible(true)}
                 >
-                    <CountryFlag isoCode={countryCode.flag} size={18}/>
+                    <CountryFlag isoCode={countryCode.flag} size={18} />
                     <Text style={styles.dialCode}>{countryCode.dial_code}</Text>
                 </TouchableOpacity>
 
@@ -116,12 +118,22 @@ const PhoneNumberScreen = ({ navigation }) => {
                 </View>
             </View>
 
-            <Pressable 
-                style={styles.nextButton}
-                onPress={handleNext}
-            >
-                <Text style={styles.buttonText}>Next</Text>
-            </Pressable>
+            <View style={styles.buttonsContainer}>
+
+                    <Pressable 
+                        style={styles.button}
+                        onPress={() => navigation.goBack()}
+                    >
+                        <Ionicons name="arrow-back-outline" size={24} color="#fff" />
+                    </Pressable>
+                                        
+                    <Pressable 
+                        style={styles.button}
+                        onPress={handleNext}
+                    >
+                        <MaterialIcons name="shopping-cart-checkout" size={24} color="#fff" />
+                    </Pressable>
+                </View>
 
             {showError && <ErrorComponent message="Type in valid phone number!" resetKey={errorKey}/>}
         </View>
@@ -164,6 +176,8 @@ const styles = StyleSheet.create({
     input: {
         flex: 1,
         padding: 10,
+        color: "black",
+        fontSize: 18
         
     },
     flagContainer: {
@@ -173,16 +187,17 @@ const styles = StyleSheet.create({
         padding: 5,
         marginRight: 10,
         borderRightWidth: 1,
-        borderRightColor: "black",
+        borderRightColor: "#ddd",
     },
     flag: {
         fontSize: 18,
         alignSelf: "center",
-        textAlign: "center"
+        textAlign: "center",
+        marginRight: 10,
     },
     dialCode: {
         fontSize: 18,
-        marginLeft: 5,
+        marginLeft: 10,
     },
     modalOverlay: {
         flex: 1,
@@ -244,6 +259,19 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         marginBottom: 10,
     },
+    buttonsContainer: {
+        marginTop: 30,
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        gap: 10
+    },
+    button: {
+        padding: 15,
+        backgroundColor: '#FF6347',
+        alignItems: 'center',
+        borderRadius: 5,
+    }
     
 });
 

@@ -1,13 +1,13 @@
-import React, {useRef, useState, useContext, useEffect} from 'react'
+import React, {useRef, useState, useEffect} from 'react'
 import { View, Text, ScrollView, StyleSheet, Pressable, Dimensions, Platform, findNodeHandle } from 'react-native'
 import ProductCard from '../components/ProductCard'
 import ScrollHelper from '../components/ScrollHelper'
-import { CartContext } from '../context/CartContext'
 import { getCategories } from '../services/api/getRestaurantInfo'
 import Cart from '../components/Cart'
 
 
 const MainScreen = ({ route, navigation }) => {
+    
     const {products} = route.params || {};
     const scrollRef = useRef(null);
     const burgerRef = useRef(null);
@@ -72,7 +72,7 @@ const MainScreen = ({ route, navigation }) => {
     const handleCategoryPress = (category) => {
         setActiveCategory(category);
 
-        if (Platform.OS === 'ios'){
+        if (Platform.OS === 'ios' || Platform.OS === 'android'){
             scrollToCategoryIOS(category);
         } else if(Platform.OS === 'web'){
             ScrollHelper.scrollToCategory(scrollRef, category);
@@ -167,7 +167,6 @@ const styles = StyleSheet.create({
     categoryContainer: {
         flexDirection: 'row',
         justifyContent: 'center',
-        marginBottom: 10,
         paddingVertical: 10,
         borderBottomWidth: 1,
         borderBottomColor: '#ddd',
@@ -196,8 +195,8 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: 'column',
         justifyContent: 'space-between',
-        gap: 10
     },
+
     productContainer: {
         flex: 2,
         padding: 10,
@@ -212,13 +211,14 @@ const styles = StyleSheet.create({
     categoryTitle: {
         fontSize: 24,
         fontWeight: 'bold',
-        marginVertical: 10,
-        padding: 25,
+        marginTop: 50,
+        paddingHorizontal: 25,
     },
     cardContainer: {
         flexDirection: 'row',
         flexWrap: 'wrap',
         justifyContent: 'space-between',
         padding: 5,
+        
     },
 });

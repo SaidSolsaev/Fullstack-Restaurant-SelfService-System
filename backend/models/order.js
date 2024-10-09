@@ -46,7 +46,7 @@ const OrderItems = sequelize.define('OrderItems', {
     timestamps: false,
 });
 
-Order.belongsToMany(MenuItem, { through: OrderItems, foreignKey: 'orderId' });
+Order.belongsToMany(MenuItem, { through: OrderItems, foreignKey: 'orderId', as: 'menuItems' });
 MenuItem.belongsToMany(Order, { through: OrderItems, foreignKey: 'menuItemId' });
 
 export default Order;

@@ -1,35 +1,46 @@
 import express from 'express';
-import { initiatePayment, handlePaymentCallback } from '../services/paymentService.js';
+import { initiatePayment, handlePaymentCallback, getPaymentDetails } from '../services/paymentService.js';
 
 const router = express.Router();
 
-// Payment initiation route
+
 router.post('/start-payment', async (req, res) => {
-    const { phoneNumber, amount } = req.body;
+    const { phoneNumber, amount, fallbackUrl, orderId } = req.body;
     
     try {
-        const paymentResponse = await initiatePayment(phoneNumber, amount);
+        const paymentResponse = await initiatePayment(phoneNumber, amount, fallbackUrl, orderId);
         res.json(paymentResponse);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
 
-// Payment callback route
+
 router.post('/callback', async (req, res) => {
-    const { orderId, paymentDetails } = req.body;
-  
+    const { orderId } = req.body;
+    console.log('Callback recived', req.body);
+
+    if (!orderId) {
+        console.error('Missing orderId:', req.body);
+        return res.status(400).json({ error: 'Missing orderId' });
+    }
+
     try {
-        await handlePaymentCallback(orderId, paymentDetails);
-        res.status(200).send('Callback processed');
+        const paymentDetails = await getPaymentDetails(orderId);
+
+        console.log('(Post Callback) Payment details received from Vipps:', paymentDetails)
+
+        const callbackResult = await handlePaymentCallback(orderId, paymentDetails);
+        res.status(200).json({ message: 'Callback processed', status: callbackResult.status });
     } catch (error) {
-        res.status(500).send('Callback failed');
+        console.error('Error processing callback:', error);
+        res.status(500).json({ message: 'Callback failed'})
     }
 });
 
-// Consent removal route
+
 router.post('/remove-consent', async (req, res) => {
-    const removalData = req.body; // Data from Vipps about consent removal
+    const removalData = req.body;
 
     console.log('Consent removed:', removalData);
 

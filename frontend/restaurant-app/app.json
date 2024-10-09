@@ -1,8 +1,8 @@
 {
   "expo": {
+    "scheme": "exp",
     "name": "myapp",
     "slug": "myapp",
-    "scheme": "myapp",
     "version": "1.0.0",
     "orientation": "default",
     "platforms": ["ios", "android", "web"],
@@ -14,28 +14,28 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "bundleIdentifier": "com.yourcompany.myapp",
+      "bundleIdentifier": "com.yourcompany.exp",
       "infoPlist": {
         "CFBundleURLTypes": [
           {
-            "CFBundleURLSchemes": ["myapp"]
+            "CFBundleURLSchemes": ["exp"]
           }
         ]
       }
     },
     "android": {
-      "package": "com.yourcompany.myapp",
+      "package": "com.yourcompany.exp",
       "intentFilters": [
         {
           "action": "VIEW",
           "data": [
             {
               "scheme": "https",
-              "host": "*.myapp.com",
+              "host": "*.yourapp.com",
               "pathPrefix": "/"
             },
             {
-              "scheme": "myapp"
+              "scheme": "exp"
             }
           ],
           "category": ["BROWSABLE", "DEFAULT"]

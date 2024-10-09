@@ -1,24 +1,64 @@
-import React, {useContext, useEffect} from 'react';
-import { View, Text, Pressable, StyleSheet, Alert, Linking } from 'react-native';
+import React, {useContext, useEffect, useState} from 'react';
+import { View, Text, Pressable, StyleSheet, Alert, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { CartContext } from '../context/CartContext';
+import * as Linking from "expo-linking";
+import { useNavigation } from '@react-navigation/native';
 
 
-
-const PaymentScreen = ({ route, navigation }) => {
+const PaymentScreen = ({ route }) => {
     const { phoneNumber } = route.params;
-    const { getTotalPrice } = useContext(CartContext);
+    const { getTotalPrice, cartItems } = useContext(CartContext);
+    let totalPrice = (10 * getTotalPrice()).toFixed(2);
+    const navigation = useNavigation();
 
+    const paymentSuccess = route.params?.paymentSuccess;
+
+
+    
+
+    useEffect(() => {
+        const handleDeepLink = (event) => {
+            const url = event.url;
+            
+            if (url.includes('payment-processing')){
+                const {queryParams} = Linking.parse(url);
+                navigation.navigate('PaymentProcessing', {orderId: queryParams.orderId, phoneNumber: queryParams.phoneNumber})
+            }
+        };
+
+        
+        const subscription = Linking.addEventListener('url', handleDeepLink);
+
+
+        Linking.getInitialURL().then((url) => {
+            if (url && url.includes('payment-processing')){
+                
+                navigation.navigate('PaymentProcessing');
+            }
+        });
+
+        return () => {
+            subscription.remove();
+        }
+
+        
+    }, [navigation])
 
     const handlePayment = (method) => {
         alert(`Du har valgt å betale med ${method}.`);
     };
 
-    let totalPrice = (10 * getTotalPrice()).toFixed(2);
 
     const handleVippsPayment = async () => {
         try {
-            const response = await fetch('https://c895-158-248-76-1.ngrok-free.app/api/payment/start-payment', {
+            const orderId = `order-${Date.now()}`;
+
+            const fallbackUrl = Platform.OS === 'web'
+                ? `http://localhost:8081/payment-processing?phoneNumber=${phoneNumber}&orderId=${orderId}`
+                : `exp://192.168.0.170:8081/--/payment-processing?phoneNumber=${phoneNumber}&orderId=${orderId}`;
+
+            const response = await fetch('https://7158-158-248-76-1.ngrok-free.app/api/payment/start-payment', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -27,20 +67,26 @@ const PaymentScreen = ({ route, navigation }) => {
                 body: JSON.stringify({
                     phoneNumber: phoneNumber,
                     amount: totalPrice,
+                    orderId: orderId,
+                    fallbackUrl: fallbackUrl
                 }),
             });
 
-            if (response.ok) {
-                const data = await response.json();
-
-                if (data.url) {
-                    Linking.openURL(data.url);
-                } else {
-                    Alert.alert('Error', 'Failed to initiate payment');
-                }
-            } else {
-                Alert.alert('Error', 'Failed to initiate payment');
+            if (!response.ok) {
+                Alert.alert('Error', 'Failed to initiate payment.');
+                console.error('Response not OK:', response.status);
+                return;
             }
+            
+            const data = await response.json();
+
+            if (data.url){
+                Linking.openURL(data.url);
+                
+            }else{
+                Alert.alert('Error', 'There is no Vipps URL.');
+            }
+            
         } catch (error) {
             console.error('Error initiating payment:', error);
             Alert.alert('Error', 'Failed to initiate payment');

@@ -15,7 +15,6 @@ const CheckoutScreen = ({ navigation }) => {
                 {cartItems.map((item) => (
                     <CartItem key={item.id} item={item}/>
                 ))}
-                <Text style={styles.totalPrice}>Total: ${getTotalPrice()}</Text>
 
                 <View style={styles.buttonsContainer}>
 
@@ -25,6 +24,8 @@ const CheckoutScreen = ({ navigation }) => {
                     >
                         <Ionicons name="arrow-back-outline" size={24} color="#fff" />
                     </Pressable>
+                    
+                    <Text style={styles.totalPrice}>Total: ${getTotalPrice()}</Text>
                     
                     <Pressable 
                         style={styles.button}
@@ -56,12 +57,13 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 24,
         fontWeight: 'bold',
-        marginBottom: 20,
+        marginVertical: 30,
+        borderBottomWidth: 1,
+        borderBottomColor: "#ddd",
     },
     totalPrice: {
         fontSize: 18,
         fontWeight: 'bold',
-        marginTop: 20,
     },
     button: {
         padding: 15,

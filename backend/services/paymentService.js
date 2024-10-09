@@ -1,6 +1,7 @@
 import axios from "axios";
 import express from "express";
 
+
 const CLIENT_ID = process.env.VIPPS_CLIENT_ID;
 const CLIENT_SECRET = process.env.VIPPS_CLIENT_SECRET;
 const SUBSCRIPTION_KEY = process.env.VIPPS_SUBSCRIPTION_KEY;
@@ -34,7 +35,7 @@ const getAccessToken = async () => {
     }
 };
 
-export const initiatePayment = async(phoneNumber, amount) => {
+export const initiatePayment = async(phoneNumber, amount, fallbackUrl, orderId) => {
     const accessToken = await getAccessToken();
 
     const paymentData = {
@@ -44,14 +45,14 @@ export const initiatePayment = async(phoneNumber, amount) => {
         merchantInfo: {
             merchantSerialNumber: '344925',
             callbackPrefix: `https://${process.env.NGROK_URL}/api/payment/callback`,
-            fallBack: `myapp://payment-success`,
+            fallBack: fallbackUrl,
             consentRemovalPrefix: `https://${process.env.NGROK_URL}/api/payment/remove-consent`,
             paymentType: 'eComm Regular Payment',
         },
         transaction: {
             amount: amount * 100,
             transactionText: 'Order payment for your purchase',
-            orderId: `order-${Date.now()}`,
+            orderId: orderId,
         },
     };
 
@@ -69,8 +70,12 @@ export const initiatePayment = async(phoneNumber, amount) => {
                 },
             }
         );
+
         
-        return response.data;
+        return {
+            url: response.data.url,
+            orderId: orderId
+        };
     } catch (error) {
         // console.error('Failed to initiate payment', error);
         throw new Error('Payment initiation failed');
@@ -78,6 +83,55 @@ export const initiatePayment = async(phoneNumber, amount) => {
 }
 
 export const handlePaymentCallback = async (orderId, paymentDetails) => {
-    // Handle the callback from Vipps (e.g., update order status in database)
+
+    const latestTransaction = paymentDetails.transactionLogHistory[0];
+
+    if (!latestTransaction) {
+        console.log(`No transaction log found for order: ${orderId}`);
+        return { status: 'unknown' };
+    }
+
+    const paymentStatus = latestTransaction.operation;
     console.log(`Payment callback received for order: ${orderId}`, paymentDetails);
+
+    if (paymentStatus === 'CANCEL') {
+        console.log(`Payment for order ${orderId} ${paymentStatus}.`);
+        return { status: 'cancelled' };
+    } else if (paymentStatus === 'VOID') {
+        console.log(`Payment for order ${orderId} ${paymentStatus}.`);
+        return { status: 'void' };
+    } else if (paymentStatus === 'SALE') {
+        console.log(`Payment for order ${orderId} ${paymentStatus}.`);
+        return { status: 'completed' };
+    } else if (paymentStatus === 'RESERVE') {
+        return { status: 'reserved' };
+    } else if(paymentStatus === 'INITIATE'){
+        console.log(`Payment for order ${orderId} ${paymentStatus}.`);
+        return {status: 'starting'}
+    } else {
+        console.log(`Unknown status: ${paymentStatus}`);
+        return {status: paymentStatus}
+    }
+};
+
+export const getPaymentDetails = async (orderId) => {
+    const accessToken = await getAccessToken();
+
+    try {
+        const response = await axios.get(
+            `${BASE_URL}/ecomm/v2/payments/${orderId}/details`,
+            {
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                    'Ocp-Apim-Subscription-Key': SUBSCRIPTION_KEY,
+                    'Content-Type': 'application/json',
+                },
+            }
+        );
+
+        return response.data;
+    } catch (error) {
+        console.error('Failed to retrieve payment details from Vipps', error);
+        throw new Error('Could not retrieve payment details from Vipps');
+    }
 };

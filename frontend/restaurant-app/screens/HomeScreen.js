@@ -55,21 +55,29 @@ const HomeScreen = ({ navigation }) => {
         >
 
             <View style={styles.container}>
-                
-                <Text style={styles.restaurantName}>{restaurant.name}</Text>
-
                 <View style={styles.buttonContainer}>
                     <Pressable 
                         style={styles.button}
                         onPress={() => navigation.navigate('Main', {products})}
                     >
-                        <Ionicons name="restaurant-outline" size={24} color="white" />
-                        <Text style={styles.buttonText}>Dine In</Text>
+                        <View style={styles.iconContainer}>
+                            <Ionicons name="restaurant-outline" size={65} color="white" />
+                        </View>
+
+                        <View style={styles.buttonTextContainer}>
+
+                            <Text style={styles.buttonText}>Dine In</Text>
+                        </View>
                     </Pressable>
                  
                     <Pressable style={styles.button}>
-                        <Ionicons name="fast-food-outline" size={24} color="white" />
-                        <Text style={styles.buttonText}>Takeaway</Text>
+                        <View style={styles.iconContainer}>
+                            <Ionicons name="fast-food-outline" size={70} color="white" />
+                        </View>
+                        
+                        <View style={styles.buttonTextContainer}>
+                            <Text style={styles.buttonText}>Takeaway</Text>
+                        </View>
                     </Pressable>
                 </View>
             </View>
@@ -90,6 +98,7 @@ const styles = StyleSheet.create({
     
     container: {
         flex: 1,
+        width: "100%",
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -106,22 +115,37 @@ const styles = StyleSheet.create({
     
     buttonContainer: {
         flexDirection: 'row',
-        justifyContent: 'space-around',
-        width: '100%',
+        alignItems: "center",
+        height: "25%",
+        width: '30%',
+        gap: 30,
     },
     
     button: {
-        flexDirection: 'row',
+        flexDirection: 'column',
+        height: "100%",
+        width: "50%",
         alignItems: 'center',
         backgroundColor: '#FF6347',
         padding: 15,
         borderRadius: 10,
-        margin: 10,
+    },
+    buttonTextContainer: {
+        height: "50%",
+        width: "100%",
+        alignItems: "center",
+        justifyContent: "center"
     },
     
     buttonText: {
         color: 'white',
-        fontSize: 18,
-        marginLeft: 10,
+        fontSize: 26,
+        textAlign: "center",
     },
+    iconContainer: {
+        height: "50%",
+        width: "100%",
+        alignItems: "center",
+        justifyContent: "center"
+    }
 })

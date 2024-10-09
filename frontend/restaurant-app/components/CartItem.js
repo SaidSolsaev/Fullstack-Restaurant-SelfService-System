@@ -76,7 +76,8 @@ const styles = StyleSheet.create({
     itemInfo: {
         flex: 2,
         marginRight: 10,
-        gap: 3
+        gap: 3,
+        alignItems: "center"
     },
     itemName: {
         fontSize: 14,
