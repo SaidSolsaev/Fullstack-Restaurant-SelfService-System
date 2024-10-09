@@ -26,6 +26,7 @@ const PaymentProcessingScreen = ({ route }) => {
 
         const getUrlParamsWeb = async () => {
             const url = await Linking.getInitialURL();
+            
             if (url){
                 const {queryParams} = Linking.parse(url);
                 setPhoneNumber(queryParams.phoneNumber);
@@ -48,7 +49,7 @@ const PaymentProcessingScreen = ({ route }) => {
     const handlePaymentCallback = async () => {
         try {
 
-            const paymentResponse = await fetch(`https://7158-158-248-76-1.ngrok-free.app/api/payment/callback`, {
+            const paymentResponse = await fetch(`${Constants.manifest2.extra.NGROK_URL}/api/payment/callback`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

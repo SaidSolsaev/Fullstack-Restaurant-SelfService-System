@@ -4,7 +4,7 @@ import { View, Text, StyleSheet } from 'react-native';
 
 const PaymentSuccessScreen = ({route}) => {
     const navigation = useNavigation();
-    const [isPaymentSuccess, setIsPaymentSuccess] = useState(false);
+    
     const { order } = route.params;
     
 

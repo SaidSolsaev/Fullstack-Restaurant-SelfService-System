@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { View, Text, Image, StyleSheet, Pressable, Dimensions } from 'react-native';
-import { CartContext } from '../context/CartContext'; // Kontekst for handlekurven
+import { CartContext } from '../context/CartContext';
 import burger from "../assets/burger.png";
 import dessert from "../assets/dessert.png";
 import drink from "../assets/drink.png";

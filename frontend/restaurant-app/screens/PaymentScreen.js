@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { CartContext } from '../context/CartContext';
 import * as Linking from "expo-linking";
 import { useNavigation } from '@react-navigation/native';
+import Constants from "expo-constants";
 
 
 const PaymentScreen = ({ route }) => {
@@ -58,7 +59,7 @@ const PaymentScreen = ({ route }) => {
                 ? `http://localhost:8081/payment-processing?phoneNumber=${phoneNumber}&orderId=${orderId}`
                 : `exp://192.168.0.170:8081/--/payment-processing?phoneNumber=${phoneNumber}&orderId=${orderId}`;
 
-            const response = await fetch('https://7158-158-248-76-1.ngrok-free.app/api/payment/start-payment', {
+            const response = await fetch(`${Constants.manifest2.extra.NGROK_URL}/api/payment/start-payment`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
