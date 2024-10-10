@@ -43,6 +43,7 @@ const HomeScreen = ({ navigation }) => {
         fetchMenuItems();
     }, [])
 
+
     if (!restaurant || !products) {
         return <Text>Loading...</Text>;
     }

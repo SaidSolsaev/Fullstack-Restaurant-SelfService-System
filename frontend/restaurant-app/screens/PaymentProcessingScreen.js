@@ -83,6 +83,7 @@ const PaymentProcessingScreen = ({ route }) => {
 
     }, [isCartReady, vippsOrderId]);
 
+
     const handlePaymentCallback = async () => {
         try {
 
@@ -101,6 +102,9 @@ const PaymentProcessingScreen = ({ route }) => {
             }
             
             const { status } = await paymentResponse.json();
+
+            console.log(status)
+
 
             setTimeout(async () => {
                 if (status === 'completed' || status === 'reserved') {

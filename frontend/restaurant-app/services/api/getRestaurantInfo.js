@@ -1,8 +1,9 @@
+import Constants from "expo-constants";
 
 
 export const getRestaurantInfo = async () => {
     try {
-        const response = await fetch('http://192.168.0.170:3000/api/restaurants/1');
+        const response = await fetch(`${Constants.expoConfig?.extra?.NGROK_URL}/api/restaurants/1`);
         const json = await response.json();
         
         return json;
@@ -13,7 +14,14 @@ export const getRestaurantInfo = async () => {
 
 export const getMenuItems = async () => {
     try {
-        const response = await fetch('http://192.168.0.170:3000/api/menu-items');
+        const response = await fetch(`${Constants.expoConfig?.extra?.NGROK_URL}/api/menu-items`);
+        
+        if(!response.ok){
+            const text = await response.text();
+            console.log('Error in get Menu items', text);
+            return null;
+        }
+        
         const json = await response.json();
         
         return json;
@@ -24,7 +32,7 @@ export const getMenuItems = async () => {
 
 export const getCategories = async () => {
     try {
-        const response = await fetch('http://192.168.0.170:3000/api/categories');
+        const response = await fetch(`${Constants.expoConfig?.extra?.NGROK_URL}/api/categories`);
         const json = await response.json();
         
         return json;
@@ -41,7 +49,7 @@ export const createOrderBackendCall = async (cartItems, phoneNumber, totalPrice)
             quantity: item.quantity
         }));
 
-        const response = await fetch(`http://192.168.0.170:3000/api/orders`, {
+        const response = await fetch(`${Constants.expoConfig?.extra?.NGROK_URL}/api/orders`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

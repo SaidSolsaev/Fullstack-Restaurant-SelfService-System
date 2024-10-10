@@ -6,7 +6,7 @@ import drink from "../assets/drink.png";
 import fries from "../assets/fries.png";
 
 const ProductModal = ({visible, product, onClose, onAddToCart}) => {
-    if (!product) return null;
+    if (!product) return <Text>No product!</Text>;
 
     let exampleProduct = null;
     if (product.Category.name === 'Burgers'){
