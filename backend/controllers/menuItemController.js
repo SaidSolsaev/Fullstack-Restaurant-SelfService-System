@@ -27,7 +27,7 @@ export const getAllMenuItems = async(req, res) => {
             ],
             where: whereCondition,
         });
-        
+        res.setHeader('Content-Type', 'application/json');
         res.status(200).json(items);
     } catch (error) {
         res.status(500).json({ error: 'Failed to fetch Menu Items' });

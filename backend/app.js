@@ -32,6 +32,7 @@ app.use('/api', orderRoutes);
 app.use('/api', adminRoutes);
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/api/payment', paymentRouter);
+
 const PORT = 3000;
 
 sequelize.sync({force: false})

@@ -94,7 +94,7 @@ export default function App() {
           <Stack.Screen 
             name="PaymentSuccess" 
             component={PaymentSuccessScreen} 
-            options={{ headerShown: true }}
+            options={{ headerShown: false }}
           />
           
           <Stack.Screen 
