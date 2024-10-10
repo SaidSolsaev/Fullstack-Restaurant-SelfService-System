@@ -1,9 +1,11 @@
-import React, {useRef, useState, useEffect} from 'react'
+import React, {useRef, useState, useEffect, useContext} from 'react'
 import { View, Text, ScrollView, StyleSheet, Pressable, Dimensions, Platform, findNodeHandle } from 'react-native'
 import ProductCard from '../components/ProductCard'
 import ScrollHelper from '../components/ScrollHelper'
 import { getCategories } from '../services/api/getRestaurantInfo'
 import Cart from '../components/Cart'
+import { CartContext } from '../context/CartContext'
+import ProductModal from '../components/ProductModal'
 
 
 const MainScreen = ({ route, navigation }) => {
@@ -16,7 +18,11 @@ const MainScreen = ({ route, navigation }) => {
     const drinksRef = useRef(null);
     const [activeCategory, setActiveCategory] = useState('burgers');
     const [categories, setCategories] = useState(null);
+    const {addToCart} = useContext(CartContext);
+    const [modalVisible, setModalVisible] = useState(false);
+    const [selectedProduct, setSelectedProduct] = useState(null);
     
+
     useEffect(() => {
         async function fetchCategories() {
             try {
@@ -77,7 +83,20 @@ const MainScreen = ({ route, navigation }) => {
         } else if(Platform.OS === 'web'){
             ScrollHelper.scrollToCategory(scrollRef, category);
         }
-    }; 
+    };
+
+    const openModal = (product) => {
+        setSelectedProduct(product);
+        setModalVisible(true);
+    };
+
+    const handleAddToCart = (product) => {
+        addToCart(product)
+    }
+
+    const closeModal = () => {
+        setModalVisible(false);
+    }
 
     const burgerProducts = products.filter(p => p.Category.name === 'Burgers');
     const sidesProducts = products.filter(p => p.Category.name === 'Sides');
@@ -120,33 +139,40 @@ const MainScreen = ({ route, navigation }) => {
                             <Text ref={burgerRef} style={styles.categoryTitle} id="burgers">Burgers</Text>
                             <View style={styles.cardContainer}>
                                 {burgerProducts.map(product => (
-                                    <ProductCard key={product.id} product={product} />
+                                    <ProductCard key={product.id} product={product} openModal={openModal}/>
                                 ))}
                             </View>
 
                             <Text ref={sidesRef} style={styles.categoryTitle} id="sides">Sides</Text>
                             <View style={styles.cardContainer}>
                                 {sidesProducts.map(product => (
-                                    <ProductCard key={product.id} product={product} />
+                                    <ProductCard key={product.id} product={product} openModal={openModal}/>
                                 ))}
                             </View>
 
                             <Text ref={dessertsRef} style={styles.categoryTitle} id="desserts">Desserts</Text>
                             <View style={styles.cardContainer}>
                                 {dessertProducts.map(product => (
-                                    <ProductCard key={product.id} product={product} />
+                                    <ProductCard key={product.id} product={product} openModal={openModal}/>
                                 ))}
                             </View>
 
                             <Text ref={drinksRef} style={styles.categoryTitle} id="drinks">Drinks</Text>
                             <View style={styles.cardContainer}>
                                 {drinkProducts.map(product => (
-                                    <ProductCard key={product.id} product={product} />
+                                    <ProductCard key={product.id} product={product} openModal={openModal}/>
                                 ))}
                             </View>
                         </View>
                     </ScrollView>
                 </View>
+
+                <ProductModal 
+                    visible={modalVisible}
+                    product={selectedProduct}
+                    onClose={closeModal}
+                    onAddToCart={handleAddToCart}
+                />
             </View>
 
             {/* Cart */}
@@ -217,7 +243,7 @@ const styles = StyleSheet.create({
     cardContainer: {
         flexDirection: 'row',
         flexWrap: 'wrap',
-        justifyContent: 'space-between',
+        justifyContent: 'flex-start',
         padding: 5,
         
     },

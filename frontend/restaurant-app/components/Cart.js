@@ -18,7 +18,7 @@ const Cart = ({navigation}) => {
             <ScrollView style={styles.scrollview} showsVerticalScrollIndicator={false}>    
                 <View style={styles.cartItemsContainer}>
                     {cartItems.length === 0 ? (
-                        <Text>Add items to Cart</Text>
+                        <Text style={styles.emptyCartText}>Cart Emtpy</Text>
                         ) : (
                             cartItems.map((item) => (
                                 <CartItem key={item.id} item={item}/>
@@ -45,14 +45,20 @@ export default Cart
 
 const styles = StyleSheet.create({
     cartContainer: {
-        width: "30%", 
         
+        width: "30%", 
         backgroundColor: '#FAEBD7',
         borderLeftWidth: 1,
         borderLeftColor: '#ddd',
         flexDirection: 'column',
         justifyContent: 'space-between',
         
+    },
+    emptyCartText: {
+        textAlign: "center",
+        fontWeight: "bold",
+        fontSize: 18,
+        marginTop: 20,
     },
     cartTitleContainer: {
         paddingVertical: 6.8,

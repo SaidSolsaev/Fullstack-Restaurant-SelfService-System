@@ -9,7 +9,7 @@ import fries from "../assets/fries.png";
 
 const { width } = Dimensions.get('window');
 
-const ProductCard = ({ product }) => {
+const ProductCard = ({ product, openModal }) => {
     const { addToCart } = useContext(CartContext);
     let exampleProduct = null;
 
@@ -28,7 +28,7 @@ const ProductCard = ({ product }) => {
     }
 
     return (
-        <View style={styles.card}>
+        <Pressable style={styles.card} onPress={() => openModal(product)}>
             <Image source={exampleProduct} style={styles.image} resizeMode="contain"/>
             <Text style={styles.name}>{product.name}</Text>
             <Text style={styles.price}>${product.price}</Text>
@@ -36,7 +36,7 @@ const ProductCard = ({ product }) => {
             <Pressable style={styles.addButton} onPress={() => handleAddToCart(product)}>
                 <Text style={{color: "#fff", fontSize: 20}}>Bestill</Text>
             </Pressable>
-        </View>
+        </Pressable>
     );
 };
 

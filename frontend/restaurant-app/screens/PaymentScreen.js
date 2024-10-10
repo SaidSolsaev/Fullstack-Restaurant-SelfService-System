@@ -9,9 +9,10 @@ import Constants from "expo-constants";
 
 const PaymentScreen = ({ route }) => {
     const { phoneNumber } = route.params;
-    const { getTotalPrice, cartItems } = useContext(CartContext);
+    const { getTotalPrice } = useContext(CartContext);
     const navigation = useNavigation();
     let totalPrice = (10 * getTotalPrice()).toFixed(2);
+    
     
     useEffect(() => {
         const handleDeepLink = (event) => {

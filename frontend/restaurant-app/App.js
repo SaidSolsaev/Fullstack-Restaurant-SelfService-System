@@ -12,6 +12,7 @@ import PaymentSuccessScreen from './screens/PaymentSuccessScreen';
 import PaymentProcessingScreen from './screens/PaymentProcessingScreen';
 import PaymentFailed from './screens/PaymentFailed';
 import { StatusBar } from 'react-native';
+import Header from './components/Header';
 
 const Stack = createNativeStackNavigator();
 
@@ -41,19 +42,73 @@ export default function App() {
     lockOrientation();
 }, []);
 
+
   return (
     <CartProvider>
       <NavigationContainer linking={linking}>
         <StatusBar hidden={true} />
-        <Stack.Navigator initialRouteName="Home">
-          <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
-          <Stack.Screen name="Main" component={MainScreen} options={{ headerShown: false }} />
-          <Stack.Screen name="Checkout" component={CheckoutScreen} options={{ headerShown: false }}/>
-          <Stack.Screen name="PhoneNumber" component={PhoneNumberScreen} options={{ headerShown: false }}/>
-          <Stack.Screen name="Payment" component={PaymentScreen} options={{ headerShown: false }}/>
-          <Stack.Screen name="PaymentSuccess" component={PaymentSuccessScreen} options={{ headerShown: false }}/>
-          <Stack.Screen name="PaymentProcessing" component={PaymentProcessingScreen} options={{ headerShown: false }} />
-          <Stack.Screen name='PaymentFail' component={PaymentFailed} options={{ headerShown: false }}/>
+        <Stack.Navigator 
+          initialRouteName="Home"
+          screenOptions={{
+            headerStyle: {
+              backgroundColor: "#FFEBCD",
+              elevation: 0,
+              shadowOpacity: 0,
+              borderBottomWidth: 0,
+              width: "70%",
+            },
+            headerLeft: () => <Header />,
+            title: "",
+          }}
+        >
+          <Stack.Screen 
+            name="Home" 
+            component={HomeScreen} 
+            options={{ headerShown: false }}
+          />
+          
+          <Stack.Screen 
+            name="Main" 
+            component={MainScreen} 
+            options={{ headerShown: true }} 
+          />
+          
+          <Stack.Screen 
+            name="Checkout" 
+            component={CheckoutScreen} 
+            options={{ headerShown: true }}
+          />
+
+          <Stack.Screen 
+            name="PhoneNumber" 
+            component={PhoneNumberScreen} 
+            options={{ headerShown: true }}
+          />
+
+          <Stack.Screen 
+            name="Payment" 
+            component={PaymentScreen} 
+            options={{ headerShown: true }}
+          />
+          
+          <Stack.Screen 
+            name="PaymentSuccess" 
+            component={PaymentSuccessScreen} 
+            options={{ headerShown: true }}
+          />
+          
+          <Stack.Screen 
+            name="PaymentProcessing" 
+            component={PaymentProcessingScreen} 
+            options={{ headerShown: false }} 
+          />
+          
+          <Stack.Screen 
+            name='PaymentFail' 
+            component={PaymentFailed} 
+            options={{ headerShown: false }}
+          />
+
         </Stack.Navigator>
       </NavigationContainer>
     </CartProvider>
