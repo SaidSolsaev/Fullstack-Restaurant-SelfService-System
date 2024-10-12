@@ -21,7 +21,7 @@ const Cart = ({navigation}) => {
                         <Text style={styles.emptyCartText}>Cart Emtpy</Text>
                         ) : (
                             cartItems.map((item) => (
-                                <CartItem key={item.id} item={item}/>
+                                <CartItem key={`${item.id}-${JSON.stringify(item.addOns)}`} item={item}/>
                             ))
                         )
                     }

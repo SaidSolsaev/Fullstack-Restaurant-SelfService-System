@@ -13,7 +13,7 @@ const CheckoutScreen = ({ navigation }) => {
             <View style={styles.container}>
                 <Text style={styles.title}>Your order</Text>
                 {cartItems.map((item) => (
-                    <CartItem key={item.id} item={item}/>
+                    <CartItem key={`${item.id}-${JSON.stringify(item.addOns)}`} item={item}/>
                 ))}
 
                 <View style={styles.buttonsContainer}>

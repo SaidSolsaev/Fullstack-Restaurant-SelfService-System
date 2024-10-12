@@ -23,7 +23,7 @@ const CartItem = ({item}) => {
     }
     
     return (
-        <View key={item.id} style={styles.cartItem}>
+        <View key={`${item.id}-${JSON.stringify(item.addOns)}`} style={styles.cartItem}>
             
             <Image
                 source={exampleProduct}
@@ -33,21 +33,24 @@ const CartItem = ({item}) => {
             
             <View style={styles.itemInfo}>
                 <Text style={styles.itemName}>{item.name}</Text>
-                <Text style={styles.itemPrice}>${item.price}</Text>
+                <Text style={styles.itemPrice}>${item.totalPrice}</Text>
+                {item.addOns.length > 0 && (
+                    <Text style={styles.itemAddOns}>{item.addOns.map(a => a.name).join(', ')}</Text>
+                )}
             </View>
             
             <View style={styles.cartControls}>
-                <Pressable onPress={() => decreaseQuantity(item.id)}>
+                <Pressable onPress={() => decreaseQuantity(item.id, item.addOns)}>
                     <Ionicons name="remove-circle-sharp" size={24} color="#FF6347" />
                 </Pressable>
                 
                 <Text style={styles.quantityText}>{item.quantity}</Text>
                 
-                <Pressable onPress={() => increaseQuantity(item.id)}>
+                <Pressable onPress={() => increaseQuantity(item.id, item.addOns)}>
                     <Ionicons name="add-circle-sharp" size={24} color="#FF6347"/>
                 </Pressable>
                 
-                <Pressable onPress={() => removeFromCart(item.id)}>
+                <Pressable onPress={() => removeFromCart(item.id, item.addOns)}>
                     <Ionicons name="trash-sharp" size={24} color="#FF6347" style={{marginHorizontal: 5}}/>
                 </Pressable>
             </View>
@@ -86,6 +89,10 @@ const styles = StyleSheet.create({
     itemPrice: {
         fontSize: 14,
         color: '#777',
+    },
+    itemAddOns: {
+        fontSize: 12,
+        color: '#999',
     },
     cartControls: {
         flexDirection: 'row',

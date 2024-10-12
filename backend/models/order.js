@@ -33,15 +33,36 @@ const Order = sequelize.define('Order', {
     timestamps: true,
 });
 
-// En order tilhører en restaurant
+
 Order.belongsTo(Restaurant, { foreignKey: 'restaurantId' });
 
-// Order kan ha flere MenuItems med mengde
+
 const OrderItems = sequelize.define('OrderItems', {
+    orderId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+            model: 'Orders',
+            key: 'id'
+        }
+    },
+    menuItemId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+            model: 'MenuItems',
+            key: 'id'
+        }
+    },
     quantity: {
         type: DataTypes.INTEGER,
         allowNull: false,
     },
+    addOns : {
+        type: DataTypes.JSON,
+        allowNull: true,
+        defaultValue: []
+    }
 }, {
     timestamps: false,
 });

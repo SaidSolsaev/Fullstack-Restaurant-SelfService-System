@@ -9,7 +9,7 @@ export const getAllOrders = async (req, res) => {
             include: [
                 {
                     model: MenuItem,
-                    through: { attributes: ['quantity'] },
+                    through: { attributes: ['quantity', 'addOns'] },
                     as: 'menuItems'
                 }
             ]
@@ -31,7 +31,7 @@ export const getOrderByOrderNumber = async (req, res) => {
                     model: MenuItem,
                     attributes: ['id', 'name'],
                     through: {
-                        attributes: ['quantity'],
+                        attributes: ['quantity', 'addOns'],
                     },
                     as: 'menuItems',
                 }
@@ -69,7 +69,7 @@ export const getOrderById = async (req, res) => {
             include: [
                 {
                     model: MenuItem,
-                    through: { attributes: ['quantity']},
+                    through: { attributes: ['quantity', 'addOns']},
                     as: 'menuItems'
                 }
             ]
@@ -100,10 +100,13 @@ export const createOrder = async (req, res) => {
 
         
         for (const item of items) {
+            const { menuItemId, quantity, addOns } = item;
+
             await OrderItems.create({
                 orderId: newOrder.id,
-                menuItemId: item.menuItemId,
-                quantity: item.quantity,
+                menuItemId: menuItemId,
+                quantity: quantity,
+                addOns: addOns
             });
         }
 

@@ -1,8 +1,12 @@
+import { Platform } from "react-native";
 
+const URL = Platform.OS === 'web' 
+    ? 'http://localhost:3000'
+    : 'https://miserably-clever-toucan.ngrok-free.app'
 
 export const getRestaurantInfo = async () => {
     try {
-        const response = await fetch(`http://localhost:3000/api/restaurants/1`);
+        const response = await fetch(`${URL}/api/restaurants/1`);
         const json = await response.json();
         
         return json;
@@ -14,9 +18,9 @@ export const getRestaurantInfo = async () => {
 export const getMenuItems = async () => {
     try {
        
-        const response = await fetch(`http://localhost:3000/api/menu-items`);
+        const response = await fetch(`${URL}/api/menu-items`);
 
-        console.log(response)
+        
 
         if(!response.ok){
             const text = await response.text();
@@ -34,7 +38,7 @@ export const getMenuItems = async () => {
 
 export const getCategories = async () => {
     try {
-        const response = await fetch(`http://localhost:3000/api/categories`);
+        const response = await fetch(`${URL}/api/categories`);
         const json = await response.json();
         
         return json;
@@ -48,10 +52,13 @@ export const createOrderBackendCall = async (cartItems, phoneNumber, totalPrice)
         
         const formattedItems = cartItems.map(item => ({
             menuItemId: item.id,
-            quantity: item.quantity
+            quantity: item.quantity,
+            addOns: item.addOns
         }));
 
-        const response = await fetch(`https://miserably-clever-toucan.ngrok-free.app/api/orders`, {
+        console.log(formattedItems);
+
+        const response = await fetch(`${URL}/api/orders`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

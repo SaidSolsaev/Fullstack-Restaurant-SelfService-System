@@ -1,5 +1,5 @@
 import React, {useRef, useState, useEffect, useContext} from 'react'
-import { View, Text, ScrollView, StyleSheet, Pressable, Dimensions, Platform, findNodeHandle } from 'react-native'
+import { View, Text, ScrollView, StyleSheet, Pressable, Platform, findNodeHandle } from 'react-native'
 import ProductCard from '../components/ProductCard'
 import ScrollHelper from '../components/ScrollHelper'
 import { getCategories } from '../services/api/getRestaurantInfo'
@@ -90,8 +90,8 @@ const MainScreen = ({ route, navigation }) => {
         setModalVisible(true);
     };
 
-    const handleAddToCart = (product) => {
-        addToCart(product)
+    const handleAddToCart = (product, addOns = []) => {
+        addToCart(product, addOns)
     }
 
     const closeModal = () => {

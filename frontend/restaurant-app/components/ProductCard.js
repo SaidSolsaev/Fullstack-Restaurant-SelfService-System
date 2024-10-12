@@ -5,6 +5,7 @@ import burger from "../assets/burger.png";
 import dessert from "../assets/dessert.png";
 import drink from "../assets/drink.png";
 import fries from "../assets/fries.png";
+import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 
 
 const { width } = Dimensions.get('window');
@@ -23,8 +24,8 @@ const ProductCard = ({ product, openModal }) => {
         exampleProduct = fries;
     }
 
-    const handleAddToCart = (product) => {
-        addToCart(product)
+    const handleAddToCart = (product, addOn = []) => {
+        addToCart(product, addOn)
     }
 
     return (
@@ -33,9 +34,13 @@ const ProductCard = ({ product, openModal }) => {
             <Text style={styles.name}>{product.name}</Text>
             <Text style={styles.price}>${product.price}</Text>
 
-            <Pressable style={styles.addButton} onPress={() => handleAddToCart(product)}>
-                <Text style={{color: "#fff", fontSize: 20}}>Bestill</Text>
-            </Pressable>
+            <View style={styles.addButtonContainer}>
+                <Pressable style={styles.addButton} onPress={() => handleAddToCart(product)}>
+                    <Text>
+                        <FontAwesome6 name="cart-plus" size={20} color="white" />
+                    </Text>
+                </Pressable>
+            </View>
         </Pressable>
     );
 };
@@ -57,11 +62,16 @@ const styles = StyleSheet.create({
         elevation: 5,
         justifyContent: 'space-between',
     },
-    addButton: {
-        width: '100%',
-        padding: 2,
-        backgroundColor: "#FF6347",
+    addButtonContainer:{
+        flexDirection: "row",
+        justifyContent: "flex-end",
         alignItems: "center",
+    },
+    addButton: {
+        
+        padding: 8,
+        backgroundColor: "#FF6347",
+        
         borderRadius: 5,
     },
     image: {
