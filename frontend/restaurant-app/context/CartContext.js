@@ -148,7 +148,7 @@ export const CartProvider = ({ children }) => {
     
 
     const getTotalPrice = () => {
-        const total = cartItems.reduce((total, item) => total + item.totalPrice * item.quantity, 0);
+        const total = cartItems.reduce((total, item) => total + parseFloat(item.totalPrice), 0);
         return parseFloat(total.toFixed(2));
     };
 
