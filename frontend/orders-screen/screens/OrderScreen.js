@@ -30,6 +30,8 @@ const OrderScreen = () => {
         const done = todaysOrders.filter(order => order.status === 'done');
         setPendingOrders(pending);
         setDoneOrders(done);
+
+        done.forEach(order => startDoneOrderTimer(order.orderNumber));
     };
 
     const fetchAndSaveOrders = async () => {
@@ -39,6 +41,14 @@ const OrderScreen = () => {
             separateOrders(newOrders);
             await saveOrdersToStorage(newOrders);
         }
+    };
+
+    const startDoneOrderTimer = (orderNumber) => {
+        setTimeout(() => {
+            setDoneOrders(prevDoneOrders => prevDoneOrders.filter(order => 
+                order.orderNumber !== orderNumber
+            ));
+        }, 600000)
     };
 
     useEffect(() => {
