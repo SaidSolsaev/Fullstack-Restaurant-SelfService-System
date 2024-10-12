@@ -1,9 +1,7 @@
-import { StyleSheet, Text, View, FlatList, Dimensions, Pressable } from 'react-native'
+import { StyleSheet, Text, View, FlatList, Pressable } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { fetchOrdersFromAPI, updateOrderStatus } from '../service/api/ordersService'
 import PendingOrders from '../components/PendingOrders';
-import { Audio } from 'expo-av';
-
 
 
 const MainScreen = () => {
