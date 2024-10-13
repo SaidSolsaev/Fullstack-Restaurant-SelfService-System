@@ -1,13 +1,18 @@
 import { StyleSheet, Text, View, FlatList, Pressable } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { fetchOrdersFromAPI, updateOrderStatus } from '../service/api/ordersService'
-import PendingOrders from '../components/PendingOrders';
+import Header from '../components/Header';
+import StatusBar from '../components/StatusBar';
+import OrderCard from '../components/OrderCard';
 
 
 const MainScreen = () => {
     const [pendingOrders, setPendingOrders] = useState([]);
     const [activeOrders, setActiveOrders] = useState([]);
+    const [canceledOrders, setCanceledOrders] = useState([]);
+    const [doneOrders, setDoneOrders] = useState([]);
 
+    const [doneOrdersTotal, setDoneOrdersTotal] = useState(0);
 
     useEffect(() => {
         fetchOrders();
@@ -24,15 +29,20 @@ const MainScreen = () => {
 
     const fetchOrders = async () => {
         const newOrders = await fetchOrdersFromAPI();
+        // console.log(newOrders);
 
         const pending = newOrders.filter(order => order.status === 'pending');
         const active = newOrders.filter(order => order.status === 'received');
+        const canceled = newOrders.filter(order => order.status === 'canceled');
+        const done = newOrders.filter(order => order.status === 'done');
 
+        
         setPendingOrders(pending);
         setActiveOrders(active);
+        setCanceledOrders(canceled);
+        setDoneOrders(done);
+        setDoneOrdersTotal(done.length)
     }
-
-
 
 
     const markAsReceived = async (orderId) => {
@@ -51,7 +61,27 @@ const MainScreen = () => {
 
         try {
             await updateOrderStatus('received', orderId);
-            console.log("Marked as received", orderId);
+        } catch (error) {
+            console.error('Failed to update order status on the backend:', error);
+        }
+    };
+
+    const markAsCanceled = async (orderId) => {
+        const order = pendingOrders.find(o => o.id === orderId);
+        
+        if (order) {
+            setPendingOrders(prev => prev.filter(o => o.id !== orderId));
+            setCanceledOrders(prev => [
+                ...prev, 
+                { 
+                    ...order, 
+                    status: 'canceled',
+                }
+            ]);
+        }
+
+        try {
+            await updateOrderStatus('canceled', orderId);
         } catch (error) {
             console.error('Failed to update order status on the backend:', error);
         }
@@ -62,11 +92,35 @@ const MainScreen = () => {
 
         if (order){
             setActiveOrders(prev => prev.filter(o => o.id !== orderId));
+            setDoneOrders(prev => [
+                ...prev,
+                {
+                    ...order,
+                    status: "done",
+                }
+            ]);
+
+            setTimeout(() => {
+                markAsDelivered(orderId)
+            }, 2 * 60 * 1000)
         }
 
         try {
             await updateOrderStatus('done', orderId);
-            console.log("Marked as done", orderId);
+        } catch (error) {
+            console.error('Failed to update order status on the backend:', error);
+        }
+    }
+
+    const markAsDelivered = async (orderId) => {
+        const order = activeOrders.find(o => o.id === orderId);
+
+        if (order){
+            setDoneOrders(prev => prev.filter(o => o.id !== orderId));
+        }
+
+        try {
+            await updateOrderStatus('delivered', orderId);
         } catch (error) {
             console.error('Failed to update order status on the backend:', error);
         }
@@ -74,43 +128,48 @@ const MainScreen = () => {
 
     
 
-    const renderActiveOrder = ({ item }) => {
-        const detailedItems = item.menuItems.map(menuItem => {
-            const addOns = menuItem.OrderItems.addOns?.map(addOn => addOn.name).join(", ");
-            return `${menuItem.OrderItems.quantity}x ${menuItem.name} (${addOns ? addOns : 'No add-ons'})`;
-        }).join("\n");
-
-        return (
-            <View style={styles.orderItem}>
-                <Text style={styles.orderNumber}>Order #{item.orderNumber}</Text>
-                <Text>Total: ${item.totalAmount}</Text>
-                <Text>{detailedItems}</Text>
-                
-                <Pressable style={styles.receiveButton} onPress={() => markAsDone(item.id)}>
-                    <Text style={styles.buttonText}>Mark as Done</Text>
-                </Pressable>
-            </View>
-        )
-
-    };
 
 
     return (
         <View style={styles.container}>
-            
-            <View style={styles.activeSection}>
-                <Text style={styles.sectionTitle}>Active Orders</Text>
-                <FlatList
-                    data={activeOrders}
-                    renderItem={renderActiveOrder}
-                    keyExtractor={(item) => item.id.toString()}
-                    numColumns={1}
-                    contentContainerStyle={styles.gridList}
-                />
-                
+            <Header />
+
+            <View style={styles.statusBarContainer}>
+                <StatusBar color="#FFC107" label="Pending" count={pendingOrders.length} />
+                <StatusBar color="#2196F3" label="Preparing" count={activeOrders.length} />
+                <StatusBar color="#4CAF50" label="Done" count={doneOrders.length} />
+                <StatusBar color="red" label="Canceled" count={canceledOrders.length} />
             </View>
 
-            <PendingOrders pendingOrders={pendingOrders} markAsReceived={markAsReceived}/>
+            <View style={styles.ordersCardSection}>
+                <OrderCard 
+                    color="#FFC107" 
+                    cardTitle="Pending" 
+                    orders={pendingOrders}
+                    markAsCanceled={markAsCanceled}
+                    markAsDone={markAsDone}
+                    markAsReceived={markAsReceived}
+                />
+                
+                <OrderCard 
+                    color="#2196F3" 
+                    cardTitle="Preparing" 
+                    orders={activeOrders}
+                    markAsCanceled={markAsCanceled}
+                    markAsDone={markAsDone}
+                    markAsReceived={markAsReceived}
+                />
+                
+                <OrderCard 
+                    color="#4CAF50" 
+                    cardTitle="Done" 
+                    orders={doneOrders} 
+                    markAsCanceled={markAsCanceled}
+                    markAsDone={markAsDone}
+                    markAsReceived={markAsReceived}
+                />
+            </View>
+            
         </View>
     )
 }
@@ -120,38 +179,20 @@ export default MainScreen
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        backgroundColor: '#333',
+    },
+    statusBarContainer:{
         flexDirection: 'row',
-        padding: 26,
-        backgroundColor: '#f0f0f0',
+        justifyContent: "space-evenly",
+        alignItems: "center",
+        marginTop: 20,
+        marginBottom: 30,
     },
-    activeSection: {
-        width: '70%', // Active orders take up 40% of the screen
-        backgroundColor: '#fff',
-        padding: 16,
-        marginRight: 16,
-        borderRadius: 10,
-        elevation: 2,
-    },
-    sectionTitle: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        marginBottom: 10,
-    },
-    orderItem: {
-        flex: 1,
-        padding: 16,
-        margin: 8,
-        backgroundColor: '#e0e0e0',
-        borderRadius: 8,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    orderNumber: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        marginBottom: 10,
-    },
-    gridList: {
-        flexGrow: 1,
-    },
+    ordersCardSection: {
+        width: "100%",
+        flexDirection: 'row',
+        padding: 12,
+        justifyContent: "space-evenly",
+    }
+    
 })

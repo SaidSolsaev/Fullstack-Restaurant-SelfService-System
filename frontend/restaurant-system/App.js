@@ -9,13 +9,13 @@ const Stack = createStackNavigator();
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName='LoginScreen'>
+      <Stack.Navigator initialRouteName='MainScreen'>
         
-        <Stack.Screen 
+        {/* <Stack.Screen 
           name='LoginScreen'
           component={LoginScreen}
           options={{headerShown: false}}
-        />
+        /> */}
 
         <Stack.Screen
           name="MainScreen"
