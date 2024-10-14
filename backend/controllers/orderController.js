@@ -1,7 +1,7 @@
 import Order from '../models/order.js';
 import MenuItem from '../models/menuItem.js';
 import { OrderItems } from '../models/order.js';
-import { generateOrderNumber } from '../utils/helpers.js';
+import { generateOrderItemNumber, generateOrderNumber } from '../utils/helpers.js';
 
 export const getAllOrders = async (req, res) => {
     try {
@@ -9,10 +9,10 @@ export const getAllOrders = async (req, res) => {
             include: [
                 {
                     model: MenuItem,
-                    through: { attributes: ['quantity', 'addOns'] },
+                    through: { attributes: ['quantity', 'addOns'], duplicating: false  },
                     as: 'menuItems'
                 }
-            ]
+            ],
         });
         res.status(200).json(orders);
     } catch (error) {
@@ -31,7 +31,7 @@ export const getOrderByOrderNumber = async (req, res) => {
                     model: MenuItem,
                     attributes: ['id', 'name'],
                     through: {
-                        attributes: ['quantity', 'addOns'],
+                        attributes: ['quantity', 'addOns'], duplicating: false
                     },
                     as: 'menuItems',
                 }
@@ -91,18 +91,19 @@ export const createOrder = async (req, res) => {
 
         const newOrder = await Order.create({
             totalAmount,
-            status: 'pending',
+            status: 'received',
             orderNumber,
             phoneNumber,
             estimatedTime: '30 min',
             restaurantId
         });
 
-        
         for (const item of items) {
             const { menuItemId, quantity, addOns } = item;
+            const orderItemsId = generateOrderItemNumber();
 
             await OrderItems.create({
+                id: orderItemsId,
                 orderId: newOrder.id,
                 menuItemId: menuItemId,
                 quantity: quantity,

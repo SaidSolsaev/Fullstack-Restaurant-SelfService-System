@@ -1,7 +1,7 @@
 import React from 'react'
 import { Dimensions, StyleSheet, Text, View } from 'react-native'
 
-const {width} = Dimensions.get('window');
+const {width} = Dimensions.get('screen');
 
 const StatusBar = ({label, count, color}) => {
     

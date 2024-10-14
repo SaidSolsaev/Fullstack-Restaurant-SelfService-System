@@ -34,10 +34,11 @@ export const fetchOrdersFromAPI = async () => {
     }
 };
 
-export const updateOrderStatus = async (status, orderId) => {
+export const updateOrderStatus = async (status, orderId, estimatedTime = 30) => {
     try {
         const response = await axios.put(`${API_URL}/api/orders/${orderId}`, {
             status: status,
+            estimatedTime: `${estimatedTime} min`,
         });
 
         return response.data;

@@ -38,6 +38,11 @@ Order.belongsTo(Restaurant, { foreignKey: 'restaurantId' });
 
 
 const OrderItems = sequelize.define('OrderItems', {
+    id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+    },
     orderId: {
         type: DataTypes.INTEGER,
         allowNull: false,
@@ -67,8 +72,16 @@ const OrderItems = sequelize.define('OrderItems', {
     timestamps: false,
 });
 
-Order.belongsToMany(MenuItem, { through: OrderItems, foreignKey: 'orderId', as: 'menuItems' });
-MenuItem.belongsToMany(Order, { through: OrderItems, foreignKey: 'menuItemId' });
+Order.belongsToMany(MenuItem, 
+    { through: {model: OrderItems, unique: false}, 
+    foreignKey: 'orderId', 
+    as: 'menuItems' 
+});
+
+MenuItem.belongsToMany(Order, 
+    { through: {model: OrderItems, unique: false},
+    foreignKey: 'menuItemId' 
+});
 
 export default Order;
 export { OrderItems };

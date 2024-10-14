@@ -1,15 +1,25 @@
 import { StyleSheet, Text, View, Pressable } from 'react-native'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+import moment from 'moment'
 
 
 
 const Header = () => {
+    const [currentTime, setCurrentTime] = useState(moment().format('HH:mm'));
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setCurrentTime(moment().format('HH:mm'))
+        }, 1000);
+
+        return () => clearInterval(interval)
+    }, [])
 
     return (
         <View style={styles.container}>
             <View style={styles.leftSide}>
                 <Text style={styles.logo}>Burgers Place</Text>
-                <Text style={styles.time}>15:51</Text>
+                <Text style={styles.time}>{currentTime}</Text>
             </View>
 
             <View style={styles.rightSide}>

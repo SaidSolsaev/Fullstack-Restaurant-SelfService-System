@@ -4,9 +4,11 @@ import { fetchOrdersFromAPI, updateOrderStatus } from '../service/api/ordersServ
 import Header from '../components/Header';
 import StatusBar from '../components/StatusBar';
 import OrderCard from '../components/OrderCard';
+import NewOrderModal from '../components/NewOrderModal';
 
 
 const MainScreen = () => {
+    const [receivedOrders, setReceivedOrders] = useState([]);
     const [pendingOrders, setPendingOrders] = useState([]);
     const [activeOrders, setActiveOrders] = useState([]);
     const [canceledOrders, setCanceledOrders] = useState([]);
@@ -14,6 +16,9 @@ const MainScreen = () => {
 
     const [doneOrdersTotal, setDoneOrdersTotal] = useState(0);
 
+    const [isOrderModalVisible, setIsOrderModalVisible] = useState(false);
+    const [currentReceivedOrder, setCurrentReceivedOrder] = useState(null);
+    
     useEffect(() => {
         fetchOrders();
 
@@ -26,26 +31,76 @@ const MainScreen = () => {
         };
     }, []);
 
-
     const fetchOrders = async () => {
         const newOrders = await fetchOrdersFromAPI();
         // console.log(newOrders);
-
+        const received = newOrders.filter(order => order.status === 'received');
         const pending = newOrders.filter(order => order.status === 'pending');
-        const active = newOrders.filter(order => order.status === 'received');
+        const active = newOrders.filter(order => order.status === 'preparing');
         const canceled = newOrders.filter(order => order.status === 'canceled');
         const done = newOrders.filter(order => order.status === 'done');
 
+        if (received.length > receivedOrders.length){
+            const newOrder = received[received.length - 1]
+            openNewOrderModal(newOrder);
+        }
         
+        setReceivedOrders(received);
         setPendingOrders(pending);
         setActiveOrders(active);
         setCanceledOrders(canceled);
         setDoneOrders(done);
-        setDoneOrdersTotal(done.length)
+        setDoneOrdersTotal(done.length);
     }
 
+    const openNewOrderModal = (order) => {
+        setCurrentReceivedOrder(order);
+        setIsOrderModalVisible(true);
+    };
 
-    const markAsReceived = async (orderId) => {
+    const handleConfrimOrder = (selectedTime = 30) => {
+        if (currentReceivedOrder){
+            updateOrderStatus('pending', currentReceivedOrder.id, selectedTime);
+            
+            setPendingOrders(prev => 
+                [
+                    ...prev,
+                    {
+                        status: 'pending',
+                        estimatedTime: selectedTime
+                    }        
+                ]
+            )
+            setReceivedOrders(prev => prev.filter(o => o.id !== currentReceivedOrder.id));
+
+        }
+        
+        setIsOrderModalVisible(false);
+        setCurrentReceivedOrder(null);
+    }
+
+    const handleCancelOrder = () => {
+        if (currentReceivedOrder) {
+            
+            updateOrderStatus('canceled', currentReceivedOrder.id);
+
+            setCanceledOrders(prev => 
+                [
+                    ...prev, 
+                    { 
+                        ...currentReceivedOrder, 
+                        status: 'canceled' 
+                    }
+                ]
+            );
+            setReceivedOrders(prev => prev.filter(o => o.id !== currentReceivedOrder.id));
+        }
+        setIsOrderModalVisible(false);
+        setCurrentReceivedOrder(null);
+    };
+
+
+    const markAsPreparing  = async (orderId) => {
         const order = pendingOrders.find(o => o.id === orderId);
         
         if (order) {
@@ -54,13 +109,13 @@ const MainScreen = () => {
                 ...prev, 
                 { 
                     ...order, 
-                    status: 'received',
+                    status: 'preparing',
                 }
             ]);
         }
 
         try {
-            await updateOrderStatus('received', orderId);
+            await updateOrderStatus('preparing', orderId);
         } catch (error) {
             console.error('Failed to update order status on the backend:', error);
         }
@@ -102,7 +157,7 @@ const MainScreen = () => {
 
             setTimeout(() => {
                 markAsDelivered(orderId)
-            }, 2 * 60 * 1000)
+            }, 6000)
         }
 
         try {
@@ -126,10 +181,6 @@ const MainScreen = () => {
         }
     }
 
-    
-
-
-
     return (
         <View style={styles.container}>
             <Header />
@@ -148,7 +199,7 @@ const MainScreen = () => {
                     orders={pendingOrders}
                     markAsCanceled={markAsCanceled}
                     markAsDone={markAsDone}
-                    markAsReceived={markAsReceived}
+                    markAsPreparing={markAsPreparing}
                 />
                 
                 <OrderCard 
@@ -157,7 +208,7 @@ const MainScreen = () => {
                     orders={activeOrders}
                     markAsCanceled={markAsCanceled}
                     markAsDone={markAsDone}
-                    markAsReceived={markAsReceived}
+                    markAsPreparing={markAsPreparing}
                 />
                 
                 <OrderCard 
@@ -166,9 +217,16 @@ const MainScreen = () => {
                     orders={doneOrders} 
                     markAsCanceled={markAsCanceled}
                     markAsDone={markAsDone}
-                    markAsReceived={markAsReceived}
+                    markAsPreparing={markAsPreparing}
                 />
             </View>
+
+            <NewOrderModal 
+                isVisible={isOrderModalVisible}
+                onConfirm={handleConfrimOrder}
+                onCancel={handleCancelOrder}
+                orderDetails={currentReceivedOrder}
+            />
             
         </View>
     )

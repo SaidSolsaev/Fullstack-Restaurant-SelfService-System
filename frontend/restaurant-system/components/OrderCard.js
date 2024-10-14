@@ -2,34 +2,54 @@ import { Dimensions, Pressable, ScrollView, StyleSheet, Text, View } from 'react
 import React, {useState, useEffect} from 'react';
 import moment from 'moment'
 
-const {width} = Dimensions.get('window')
+const {width} = Dimensions.get('screen')
 
 
-const OrderCard = ({cardTitle, orders, color, markAsReceived, markAsCanceled, markAsDone}) => {
+const OrderCard = ({cardTitle, orders, color, markAsPreparing, markAsCanceled, markAsDone}) => {
+    const [remainingTime, setRemainingTime] = useState({});;
+
+    const calculateRemainingTime = (order) => {
+        const currentTime = moment();
+        const orderTime = moment(order.createdAt);
+        const estimatedMinutes = parseInt(order.estimatedTime.split(' ')[0]);
+        
+        const timePassed = currentTime.diff(orderTime, 'minutes');
+        const remainingTime = estimatedMinutes - timePassed;
+
+        return remainingTime;
+    };
     
+    useEffect(() => {
+        const updateRemainingTimes = () => {
+            const newRemainingTimes = {};
 
-    if(!orders && orders.length === 0){
-        return <Text>Loading..</Text>
-    }
+            orders.forEach(order => {
+                if (order.status === 'preparing'){
+                    newRemainingTimes[order.id] = calculateRemainingTime(order);
+                }
+            });
+
+            setRemainingTime(newRemainingTimes);
+        }
+
+        const interval = setInterval(updateRemainingTimes, 60000);
+
+        updateRemainingTimes();
+
+        return () => clearInterval(interval);
+    }, [orders]);
+
 
     const formatTime = (timeString) => {
         return moment(timeString).format('HH:mm');
     }
 
-    const calculateRemainingTime = (createdAt, estimatedTime) => {
-        const estimatedMinutes = parseInt(estimatedTime.split(' ')[0], 10);
-        
-        // Calculate the time difference between the current time and the order creation time
-        const orderCreatedTime = moment(createdAt);
-        const now = moment();
-        const elapsedMinutes = Math.floor(moment.duration(now.diff(orderCreatedTime)).asMinutes());
+    
 
-        // Subtract elapsed time from the estimated time
-        const remainingMinutes = estimatedMinutes - elapsedMinutes;
 
-        return remainingMinutes > 0 ? `${remainingMinutes} min left` : 'Time expired';
-    };
-
+    if(!orders && orders.length === 0){
+        return <Text>Loading..</Text>
+    }
 
     return (
         <View style={styles.container}>
@@ -52,55 +72,57 @@ const OrderCard = ({cardTitle, orders, color, markAsReceived, markAsCanceled, ma
                 </View>
             </View>
 
-            <ScrollView style={{flex: 1}}>
-                
-                {orders.map((order) => {
-                    const [remainintTime, setRemainingTime] = useState(calculateRemainingTime(order.createdAt, order.estimatedTime))
+            
+                <ScrollView >
+                    {orders.map((order) => {
+                        const rt = remainingTime[order.id] !== undefined 
+                            ? remainingTime[order.id] 
+                            : null;
+                        
+                        const isLate = rt !== null && rt < 0;
+                        
+                        const displayTime = rt !== null
+                            ? (isLate ? `-${Math.abs(rt)} min` : `${rt} min`)
+                            : 'Calculating...';
 
-                    useEffect(() => {
-                        const interval = setInterval(() => {
-                            setRemainingTime(calculateRemainingTime(order.createdAt, order.estimatedTime));
-                        }, 60000)
-
-                        return () => clearInterval(interval);
-                    }, []);
-
-                    return(
-                        <View key={order.id} style={styles.orderCard}>
-                            <View style={styles.row}>
-                                <Text style={styles.orderCardText}>{formatTime(order.createdAt)}</Text>
-                                <Text style={styles.orderCardText}>#{order.orderNumber}</Text>
-                                <Text style={styles.orderCardText}>${order.totalAmount}</Text>
+                        return(
+                            <View key={order.id} style={styles.orderCard}>
+                                <View style={styles.row}>
+                                    <Text style={styles.orderCardText}>{formatTime(order.createdAt)}</Text>
+                                    <Text style={styles.orderCardText}>#{order.orderNumber}</Text>
+                                    <Text style={styles.orderCardText}>${order.totalAmount}</Text>
+                                    
+                                    {cardTitle === 'Preparing' && (
+                                        <Text style={[styles.orderCardText, isLate && {color: 'red'}]}>
+                                            {displayTime}
+                                        </Text>
+                                    )}
+                                </View>
                                 
-                                {cardTitle === 'Preparing' && (
-                                    <Text style={styles.orderCardText}>{remainintTime}</Text>
-                                )}
-                            </View>
-                            
-                            <View style={styles.orderBtns}>
-                                {cardTitle === 'Pending' && (
-                                    <>
-                                        <Pressable style={styles.addBtn} onPress={() => markAsReceived(order.id)}>
-                                            <Text>Accept</Text>
+                                <View style={styles.orderBtns}>
+                                    {cardTitle === 'Pending' && (
+                                        <>
+                                            <Pressable key={`${order.id}-accept`} style={styles.addBtn} onPress={() => markAsPreparing(order.id)}>
+                                                <Text>Accept</Text>
+                                            </Pressable>
+
+                                            <Pressable key={`${order.id}-cancel`} style={styles.cancelBtn} onPress={() => markAsCanceled(order.id)}>
+                                                <Text>Cancel</Text>
+                                            </Pressable>
+                                        </>
+                                    )}
+
+                                    {cardTitle === 'Preparing' && (
+                                        <Pressable key={`${order.id}-done`} style={styles.addBtn} onPress={() => markAsDone(order.id)}>
+                                            <Text>Mark as Done</Text>
                                         </Pressable>
+                                    )}
+                                </View>
 
-                                        <Pressable style={styles.cancelBtn} onPress={() => markAsCanceled(order.id)}>
-                                            <Text>Cancel</Text>
-                                        </Pressable>
-                                    </>
-                                )}
-
-                                {cardTitle === 'Preparing' && (
-                                    <Pressable style={styles.addBtn} onPress={() => markAsDone(order.id)}>
-                                        <Text>Mark as Done</Text>
-                                    </Pressable>
-                                )}
                             </View>
-
-                        </View>
-                    )
-                })}
-            </ScrollView>
+                        )
+                    })}
+                </ScrollView>
             
         </View>
     )
@@ -112,7 +134,8 @@ const styles = StyleSheet.create({
     container: {
         width: width * 0.33,
         padding: 12,
-
+        flex: 1,
+        maxHeight: 600
     },
     header: {
         flexDirection: 'column',
