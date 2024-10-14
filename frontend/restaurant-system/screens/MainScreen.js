@@ -13,8 +13,8 @@ const MainScreen = () => {
     const [activeOrders, setActiveOrders] = useState([]);
     const [canceledOrders, setCanceledOrders] = useState([]);
     const [doneOrders, setDoneOrders] = useState([]);
-
-    const [doneOrdersTotal, setDoneOrdersTotal] = useState(0);
+    const [deliveredOrders, setDeliveredOrders] = useState([])
+    
 
     const [isOrderModalVisible, setIsOrderModalVisible] = useState(false);
     const [currentReceivedOrder, setCurrentReceivedOrder] = useState(null);
@@ -39,6 +39,7 @@ const MainScreen = () => {
         const active = newOrders.filter(order => order.status === 'preparing');
         const canceled = newOrders.filter(order => order.status === 'canceled');
         const done = newOrders.filter(order => order.status === 'done');
+        const delivered = newOrders.filter(order => order.status === 'delivered');
 
         if (received.length > receivedOrders.length){
             const newOrder = received[received.length - 1]
@@ -50,7 +51,7 @@ const MainScreen = () => {
         setActiveOrders(active);
         setCanceledOrders(canceled);
         setDoneOrders(done);
-        setDoneOrdersTotal(done.length);
+        setDeliveredOrders(delivered);
     }
 
     const openNewOrderModal = (order) => {
@@ -189,7 +190,9 @@ const MainScreen = () => {
                 <StatusBar color="#FFC107" label="Pending" count={pendingOrders.length} />
                 <StatusBar color="#2196F3" label="Preparing" count={activeOrders.length} />
                 <StatusBar color="#4CAF50" label="Done" count={doneOrders.length} />
+                <StatusBar color="purple" label="Delivered" count={deliveredOrders.length} />
                 <StatusBar color="red" label="Canceled" count={canceledOrders.length} />
+            
             </View>
 
             <View style={styles.ordersCardSection}>

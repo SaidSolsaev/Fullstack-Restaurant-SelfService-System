@@ -35,7 +35,7 @@ app.use('/api/payment', paymentRouter);
 
 const PORT = 3000;
 
-sequelize.sync({force: false})
+sequelize.sync({ alter: true})
     .then(() => {
         console.log("DB synched");
         app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

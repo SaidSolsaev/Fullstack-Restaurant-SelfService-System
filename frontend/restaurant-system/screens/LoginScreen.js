@@ -1,19 +1,16 @@
 import { Pressable, StyleSheet, Text, View, TextInput } from 'react-native'
-import React, { useState } from 'react'
-import {useNavigation} from "@react-navigation/native"
-import { handleLogin } from '../service/api/loginService';
+import React, { useContext, useState } from 'react'
+import { AuthContext } from '../context/AuthContext';
 
 const LoginScreen = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const navigation = useNavigation();
+    const {login} = useContext(AuthContext);
+
 
     const onLoginPress = async () => {
-        const loginData = await handleLogin(email, password);
-
-        if (loginData){
-            navigation.replace('MainScreen');
-        }
+        await login(email, password);
+        navigation.replace('MainScreen');
     }
 
     return (

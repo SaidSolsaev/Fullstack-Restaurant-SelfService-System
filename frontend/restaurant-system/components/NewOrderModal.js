@@ -1,7 +1,8 @@
 import { Modal, StyleSheet, Text, View, Dimensions, Pressable, ScrollView, Platform } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import {Audio} from "expo-av";
-import jsPDF from "jspdf";
+import { generatePDF } from '../helpers/generatePdf';
+
 
 const {width} = Dimensions.get('screen')
 
@@ -9,6 +10,7 @@ const NewOrderModal = ({isVisible, onConfirm, onCancel, orderDetails}) => {
     const [sound, setSound] = useState();
     const [selectedTime, setSelectedTime] = useState(null);
     const times = [10, 15, 20, 25, 30, 45, 60, 90];
+
 
     useEffect(() => {
         if (isVisible){
@@ -35,35 +37,9 @@ const NewOrderModal = ({isVisible, onConfirm, onCancel, orderDetails}) => {
         };
     };
 
-    const generatePDF = async () => {
-        
-        const doc = new jsPDF();
-
-        doc.text('Order Receipt', 10, 10);
-        doc.text(`Order Number: ${orderDetails.orderNumber}`, 10, 20);
-        doc.text(`Phone Number: ${orderDetails.phoneNumber}`, 10, 30);
-        doc.text(`Total Amount: $${orderDetails.totalAmount}`, 10, 40);
-
-        doc.text("Items:", 10, 50);
-        let yPos = 60;
-        orderDetails.menuItems.forEach(item => {
-            doc.text(`${item.name} x ${item.OrderItems.quantity}`, 10, yPos);
-            
-            if (item.OrderItems.addOns.length > 0) {
-                const addOns = item.OrderItems.addOns.map(a => a.name).join(", ");
-                doc.text(`Add-ons: ${addOns}`, 10, yPos + 10);
-            }
-            yPos += 20;
-        });
-
-        doc.save(`Order_${orderDetails.orderNumber}.pdf`);
-        
-        
-    }
-
     const handleConfirm = () => {
         stopSound();
-        generatePDF();
+        generatePDF(orderDetails);
         onConfirm(selectedTime);
     };
     
@@ -85,14 +61,14 @@ const NewOrderModal = ({isVisible, onConfirm, onCancel, orderDetails}) => {
                         <Text style={styles.prepTitle}>Order #{orderDetails?.orderNumber}</Text>
                         <Text style={styles.prepTitle}>Total Amount: ${orderDetails?.totalAmount}</Text>
 
-                        {orderDetails?.menuItems?.map((item, index) => (
+                        {orderDetails?.orderItems?.map((item, index) => (
                             <View key={index} style={styles.menuItemRow}>
-                                <Text style={styles.menuItemName}>{item.name}</Text>
-                                <Text style={styles.menuItemQuantity}>{item.OrderItems?.quantity}x</Text>
+                                <Text style={styles.menuItemName}>{item.MenuItem?.name}</Text>
+                                <Text style={styles.menuItemQuantity}>{item.quantity}x</Text>
                                 
-                                {item.OrderItems?.addOns?.length > 0 && (
-                                    <Text  key={`${item.id}-addon-${index}`} style={styles.menuItemAddOns}>
-                                        +{item.OrderItems.addOns.map(a => a.name).join(', ')}
+                                {item.addOns?.length > 0 && (
+                                    <Text  key={`${item.MenuItem.id}-addon-${index}`} style={styles.menuItemAddOns}>
+                                        +{item.addOns.map(a => a.name).join(', ')}
                                     </Text>
                                 )}
                             </View>
@@ -142,6 +118,7 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         padding: 20,
         alignItems: 'center',
+        maxHeight: 600,
     },
     prepTitle: {
         fontSize: 16,

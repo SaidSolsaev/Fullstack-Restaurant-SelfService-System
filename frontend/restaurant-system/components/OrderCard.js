@@ -1,6 +1,8 @@
 import { Dimensions, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import React, {useState, useEffect} from 'react';
 import moment from 'moment'
+import FontAwesome from '@expo/vector-icons/FontAwesome';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 const {width} = Dimensions.get('screen')
 
@@ -53,77 +55,83 @@ const OrderCard = ({cardTitle, orders, color, markAsPreparing, markAsCanceled, m
 
     return (
         <View style={styles.container}>
-            
             <View style={styles.header}>
-                
-                <View style={[styles.titleRow, {backgroundColor: color}]}>
-                    <Text style={{fontSize: 16, fontWeight: "bold"}}>{cardTitle}</Text>
-                    <Text>Icon..</Text>
+                <View style={[styles.titleRow, { backgroundColor: color }]}>
+                    <Text style={{ fontSize: 16, fontWeight: 'bold' }}>{cardTitle}</Text>
+                    <Text>
+                        {cardTitle === 'Pending' && (
+                            <FontAwesome name="hourglass-1" size={24} color="black" />
+                        )}
+                        {cardTitle === 'Preparing' && (
+                            <Ionicons name="fast-food" size={24} color="black" />
+                        )}
+                        {cardTitle === 'Done' && (
+                            <Ionicons name="cloud-done" size={24} color="black" />
+                        )}
+                    </Text>
                 </View>
 
                 <View style={styles.row}>
                     <Text style={styles.orderCardText}>Time</Text>
                     <Text style={styles.orderCardText}>Order</Text>
                     <Text style={styles.orderCardText}>Total</Text>
-                    
+
                     {cardTitle === 'Preparing' && (
                         <Text style={styles.orderCardText}>Timeleft</Text>
                     )}
                 </View>
             </View>
 
-            
-                <ScrollView >
-                    {orders.map((order) => {
-                        const rt = remainingTime[order.id] !== undefined 
-                            ? remainingTime[order.id] 
-                            : null;
-                        
-                        const isLate = rt !== null && rt < 0;
-                        
-                        const displayTime = rt !== null
-                            ? (isLate ? `-${Math.abs(rt)} min` : `${rt} min`)
-                            : 'Calculating...';
+            <ScrollView>
+                {orders.map((order) => {
+                    const rt = remainingTime[order.id] !== undefined ? remainingTime[order.id] : null;
+                    const isLate = rt !== null && rt < 0;
 
-                        return(
-                            <View key={order.id} style={styles.orderCard}>
-                                <View style={styles.row}>
-                                    <Text style={styles.orderCardText}>{formatTime(order.createdAt)}</Text>
-                                    <Text style={styles.orderCardText}>#{order.orderNumber}</Text>
-                                    <Text style={styles.orderCardText}>${order.totalAmount}</Text>
-                                    
-                                    {cardTitle === 'Preparing' && (
-                                        <Text style={[styles.orderCardText, isLate && {color: 'red'}]}>
-                                            {displayTime}
-                                        </Text>
-                                    )}
-                                </View>
-                                
-                                <View style={styles.orderBtns}>
-                                    {cardTitle === 'Pending' && (
-                                        <>
-                                            <Pressable key={`${order.id}-accept`} style={styles.addBtn} onPress={() => markAsPreparing(order.id)}>
-                                                <Text>Accept</Text>
-                                            </Pressable>
+                    const displayTime = rt !== null
+                        ? (isLate ? `-${Math.abs(rt)} min` : `${rt} min`)
+                    : 'Calculating...';
+                    
+                    if (!order.id){
+                        return null;
+                    }
+                  
+                    return (
+                        <View key={order.id} style={styles.orderCard}>
+                            <View style={styles.row}>
+                                <Text style={styles.orderCardText}>{formatTime(order.createdAt)}</Text>
+                                <Text style={styles.orderCardText}>#{order.orderNumber}</Text>
+                                <Text style={styles.orderCardText}>${order.totalAmount}</Text>
 
-                                            <Pressable key={`${order.id}-cancel`} style={styles.cancelBtn} onPress={() => markAsCanceled(order.id)}>
-                                                <Text>Cancel</Text>
-                                            </Pressable>
-                                        </>
-                                    )}
-
-                                    {cardTitle === 'Preparing' && (
-                                        <Pressable key={`${order.id}-done`} style={styles.addBtn} onPress={() => markAsDone(order.id)}>
-                                            <Text>Mark as Done</Text>
-                                        </Pressable>
-                                    )}
-                                </View>
-
+                                {cardTitle === 'Preparing' && (
+                                    <Text style={[styles.orderCardText, isLate && { color: 'red' }]}>
+                                        {displayTime}
+                                    </Text>
+                                )}
                             </View>
-                        )
-                    })}
-                </ScrollView>
-            
+
+                            <View style={styles.orderBtns}>
+                                {cardTitle === 'Pending' && (
+                                    <>
+                                        <Pressable key={`${order.id}-start`} style={styles.addBtn} onPress={() => markAsPreparing(order.id)}>
+                                            <Text>Start</Text>
+                                        </Pressable>
+
+                                        <Pressable key={`${order.id}-cancel`} style={styles.cancelBtn} onPress={() => markAsCanceled(order.id)}>
+                                            <Text>Cancel</Text>
+                                        </Pressable>
+                                    </>
+                                )}
+
+                                {cardTitle === 'Preparing' && (
+                                    <Pressable key={`${order.id}-done`} style={styles.addBtn} onPress={() => markAsDone(order.id)}>
+                                        <Text>Mark as Done</Text>
+                                    </Pressable>
+                                )}
+                            </View>
+                        </View>
+                    );
+                })}
+            </ScrollView>
         </View>
     )
 }

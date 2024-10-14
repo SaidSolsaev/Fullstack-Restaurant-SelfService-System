@@ -1,10 +1,10 @@
-import { StyleSheet, Text, View } from 'react-native';
-import MainScreen from './screens/MainScreen';
+import { StyleSheet, Text, View, StatusBar } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack'
-import LoginScreen from './screens/LoginScreen';
 import * as ScreenOrientation from 'expo-screen-orientation';
 import { useEffect } from 'react';
+import { AuthProvider } from './context/AuthContext';
+import RootNavigator from './RootNavigator';
 
 const Stack = createStackNavigator();
 
@@ -18,22 +18,15 @@ export default function App() {
   }, []);
 
   return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName='MainScreen'>
+    <AuthProvider>
+      <NavigationContainer>
         
-        {/* <Stack.Screen 
-          name='LoginScreen'
-          component={LoginScreen}
-          options={{headerShown: false}}
-        /> */}
-
-        <Stack.Screen
-          name="MainScreen"
-          component={MainScreen}
-          options={{ headerShown: false }}
-        />
-      </Stack.Navigator>
-    </NavigationContainer>
+        <StatusBar hidden={true} />
+        
+        <RootNavigator />
+      
+      </NavigationContainer>
+    </AuthProvider>
   );
 }
 

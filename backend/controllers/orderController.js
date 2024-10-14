@@ -2,21 +2,30 @@ import Order from '../models/order.js';
 import MenuItem from '../models/menuItem.js';
 import { OrderItems } from '../models/order.js';
 import { generateOrderItemNumber, generateOrderNumber } from '../utils/helpers.js';
+import sequelize from '../config/db.js';
 
 export const getAllOrders = async (req, res) => {
     try {
         const orders = await Order.findAll({
             include: [
                 {
-                    model: MenuItem,
-                    through: { attributes: ['quantity', 'addOns'], duplicating: false  },
-                    as: 'menuItems'
+                    model: OrderItems, // Include OrderItems
+                    as: 'orderItems',
+                    include: [
+                        {
+                            model: MenuItem, // Include MenuItem through OrderItems
+                            attributes: ['id', 'name', 'price'],
+                        },
+                    ],
+                    attributes: ['quantity', 'addOns'], // Include additional info from OrderItems
                 }
             ],
         });
+
         res.status(200).json(orders);
     } catch (error) {
-        res.status(500).json({ error: 'Error fetching orders' });
+        console.error('Error fetching orders:', error.message);
+        res.status(500).json({ error: 'Error fetching orders', details: error.message });
     }
 };
 
@@ -28,12 +37,15 @@ export const getOrderByOrderNumber = async (req, res) => {
             where: { orderNumber },
             include: [
                 {
-                    model: MenuItem,
-                    attributes: ['id', 'name'],
-                    through: {
-                        attributes: ['quantity', 'addOns'], duplicating: false
-                    },
-                    as: 'menuItems',
+                    model: OrderItems,
+                    as: 'orderItems',
+                    include: [
+                        {
+                            model: MenuItem,
+                            attributes: ['id', 'name'],
+                        },
+                    ],
+                    attributes: ['quantity', 'addOns'],
                 }
             ],
             attributes: ['orderNumber', 'totalAmount'],
@@ -43,14 +55,14 @@ export const getOrderByOrderNumber = async (req, res) => {
             return res.status(404).json({ error: 'Order not found' });
         }
 
-        
         const formattedOrder = {
             orderNumber: order.orderNumber,
             totalAmount: order.totalAmount,
-            orderedItems: order.menuItems.map(menuItem => ({
-                itemId: menuItem.id,
-                itemName: menuItem.name,
-                quantity: menuItem.OrderItems.quantity
+            orderedItems: order.orderItems.map(orderItem => ({
+                itemId: orderItem.menuItem.id,
+                itemName: orderItem.menuItem.name,
+                quantity: orderItem.quantity,
+                addOns: orderItem.addOns
             }))
         };
 
@@ -62,15 +74,19 @@ export const getOrderByOrderNumber = async (req, res) => {
 }
 
 export const getOrderById = async (req, res) => {
-    const { id } = req.params;
-
     try {
         const order = await Order.findByPk(id, {
             include: [
                 {
-                    model: MenuItem,
-                    through: { attributes: ['quantity', 'addOns']},
-                    as: 'menuItems'
+                    model: OrderItems,
+                    as: 'orderItems',
+                    include: [
+                        {
+                            model: MenuItem,
+                            attributes: ['id', 'name'],
+                        },
+                    ],
+                    attributes: ['quantity', 'addOns'],
                 }
             ]
         });
@@ -86,6 +102,8 @@ export const getOrderById = async (req, res) => {
 export const createOrder = async (req, res) => {
     const { items, phoneNumber, restaurantId, totalAmount } = req.body;
 
+    const transaction = await sequelize.transaction();
+
     try {
         const orderNumber = generateOrderNumber();
 
@@ -96,22 +114,27 @@ export const createOrder = async (req, res) => {
             phoneNumber,
             estimatedTime: '30 min',
             restaurantId
-        });
+        }, {transaction});
 
         for (const item of items) {
             const { menuItemId, quantity, addOns } = item;
-            const orderItemsId = generateOrderItemNumber();
 
             await OrderItems.create({
-                id: orderItemsId,
                 orderId: newOrder.id,
                 menuItemId: menuItemId,
                 quantity: quantity,
                 addOns: addOns
-            });
+            }, {transaction});
         }
 
-        res.status(201).json(newOrder);
+        await transaction.commit();
+
+        const createdOrder = await Order.findOne({
+            where: { id: newOrder.id },
+            include: { model: OrderItems, as: 'orderItems' }
+        });
+
+        res.status(201).json(createdOrder);
     } catch (error) {
         res.status(500).json({ error: 'Error creating order', details: error.message });
         console.log(error);

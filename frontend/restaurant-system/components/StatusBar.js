@@ -20,7 +20,7 @@ export default StatusBar
 
 const styles = StyleSheet.create({
     statusTabContainer: {
-        width: width * 0.22,
+        width: width * 0.18,
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
@@ -30,7 +30,8 @@ const styles = StyleSheet.create({
     },
     name: {
         fontSize: 18,
-        fontWeight: "bold"
+        fontWeight: "bold",
+        color: "#fff"
     },
     countContainer:{
         alignItems: "center",
