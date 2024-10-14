@@ -1,5 +1,4 @@
 import React, { createContext, useState, useEffect } from 'react';
-import { useNavigation } from '@react-navigation/native';
 import * as SecureStore from 'expo-secure-store';
 import { handleLogin, handleLogout } from '../service/api/loginService';
 import { Platform } from 'react-native';
@@ -53,7 +52,7 @@ export const AuthProvider = ({children}) => {
         const result = await handleLogin(email, password);
         
         if (result) {
-            await saveToken(result.token);
+            await saveToken(result.access_token);
             setIsLoggedIn(true);
         }
     }

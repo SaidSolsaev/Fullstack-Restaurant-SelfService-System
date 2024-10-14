@@ -62,6 +62,7 @@ export const createOrderBackendCall = async (cartItems, phoneNumber, totalPrice)
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'x-device-key': 'sedik123',
             },
             body: JSON.stringify({
                 items: formattedItems,

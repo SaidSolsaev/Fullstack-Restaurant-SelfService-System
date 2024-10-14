@@ -16,3 +16,13 @@ export const authMiddleware = (req, res, next) => {
         return res.status(403).json({ error: 'Invalid token' });
     }
 };
+
+export const verifyDeviceKey = (req, res, next) => {
+    const deviceKey = req.headers['x-device-key'];
+
+    if (!deviceKey || deviceKey !== process.env.DEVICE_SECRET_KEY) {
+        return res.status(403).json({error: 'Unathorized device'});
+    }
+
+    next()
+};

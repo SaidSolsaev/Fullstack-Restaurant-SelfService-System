@@ -26,7 +26,7 @@ const OrderScreen = () => {
             return orderDate.isSameOrAfter(today);
         });
 
-        const pending = todaysOrders.filter(order => order.status === 'pending');
+        const pending = todaysOrders.filter(order => order.status === 'pending' || order.status === 'preparing');
         const done = todaysOrders.filter(order => order.status === 'done');
         setPendingOrders(pending);
         setDoneOrders(done);

@@ -47,7 +47,10 @@ export const loginAdmin = async (req, res) => {
             maxAge: 72 * 60 * 60 * 1000  // Cookie varer i 72 timer
         });
 
-        res.status(200).json({ message: 'Logged in successfully' });
+        res.status(200).json({ 
+            message: 'Logged in successfully',
+            access_token: token,
+        });
     } catch (error) {
         res.status(500).json({ error: 'Error logging in' });
     }
