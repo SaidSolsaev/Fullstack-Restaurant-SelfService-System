@@ -1,11 +1,14 @@
 import { StyleSheet, Text, View, Pressable } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import moment from 'moment'
+import { useNavigation } from '@react-navigation/native';
 
 
 
 const Header = () => {
     const [currentTime, setCurrentTime] = useState(moment().format('HH:mm'));
+    const navigation = useNavigation()
+
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -14,6 +17,11 @@ const Header = () => {
 
         return () => clearInterval(interval)
     }, [])
+
+    const handleOrderHistyoryPress = () => {
+        console.log("clicked")
+        navigation.navigate("OrderHistory")
+    }
 
     return (
         <View style={styles.container}>
@@ -24,7 +32,7 @@ const Header = () => {
 
             <View style={styles.rightSide}>
 
-                <Pressable style={styles.headerBtn}>
+                <Pressable style={styles.headerBtn} onPress={handleOrderHistyoryPress}>
                     <Text>Order History</Text>
                 </Pressable>
 

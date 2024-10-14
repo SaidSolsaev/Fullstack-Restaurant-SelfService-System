@@ -4,6 +4,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import MainScreen from "./screens/MainScreen";
 import LoginScreen from "./screens/LoginScreen";
 import LoadingScreen from "./screens/LoadingScreen";
+import OrderHistoryScreen from "./screens/OrderHistoryScreen";
 
 const Stack = createStackNavigator();
 
@@ -20,13 +21,28 @@ function RootNavigator() {
     }
 
     return (
-        <Stack.Navigator>
+        <Stack.Navigator 
+            initialRouteName="MainScreen"
+            screenOptions={{
+                headerShown: true
+            }}
+        >
+        
             {isLoggedIn ? (
-                <Stack.Screen 
-                    name="MainScreen"
-                    component={MainScreen}
-                    options={{headerShown: false}}
-                />
+                <>
+                    <Stack.Screen 
+                        name="MainScreen"
+                        component={MainScreen}
+                        options={{headerShown: false}}
+                    />
+
+                    <Stack.Screen 
+                        name="OrderHistory"
+                        component={OrderHistoryScreen}
+                        options={{title: "Order History", headerShown: true}}
+                    />
+                </>
+                
             ) : (
                 <Stack.Screen
                     name="LoginScreen"

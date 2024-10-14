@@ -34,6 +34,16 @@ export const fetchOrdersFromAPI = async () => {
     }
 };
 
+export const getAllOrders = async () => {
+    try {
+        const response = await axios.get(`${API_URL}/api/orders`);
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching all orders", error);
+        return null;
+    }
+}
+
 export const updateOrderStatus = async (status, orderId, estimatedTime = 30) => {
     try {
         const response = await axios.put(`${API_URL}/api/orders/${orderId}`, {
