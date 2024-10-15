@@ -28,12 +28,12 @@ export const loginAdmin = async (req, res) => {
         const admin = await Admin.findOne({ where: { email } });
 
         if (!admin) {
-            return res.status(404).json({ error: 'Admin not found' });
+            return res.status(404).json({ error: 'User not found. Please Try Again!' });
         }
 
         const isPasswordValid = await bcrypt.compare(password, admin.password);
         if (!isPasswordValid) {
-            return res.status(401).json({ error: 'Invalid password' });
+            return res.status(401).json({ error: 'Invalid password. Please Try Again' });
         }
 
         const token = jwt.sign({ id: admin.id, email: admin.email, restaurantId: admin.restaurantId }, process.env.JWT_SECRET, {
@@ -52,7 +52,7 @@ export const loginAdmin = async (req, res) => {
             access_token: token,
         });
     } catch (error) {
-        res.status(500).json({ error: 'Error logging in' });
+        res.status(500).json({ error: 'An error occurred. Please try again.' });
     }
 };
 

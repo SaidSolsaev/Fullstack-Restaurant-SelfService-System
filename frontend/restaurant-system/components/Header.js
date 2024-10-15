@@ -1,13 +1,14 @@
 import { StyleSheet, Text, View, Pressable } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import moment from 'moment'
 import { useNavigation } from '@react-navigation/native';
-
+import {AuthContext} from "../context/AuthContext.js";
 
 
 const Header = () => {
     const [currentTime, setCurrentTime] = useState(moment().format('HH:mm'));
     const navigation = useNavigation()
+    const {logout} = useContext(AuthContext)
 
 
     useEffect(() => {
@@ -19,7 +20,6 @@ const Header = () => {
     }, [])
 
     const handleOrderHistyoryPress = () => {
-        console.log("clicked")
         navigation.navigate("OrderHistory")
     }
 
@@ -36,7 +36,7 @@ const Header = () => {
                     <Text>Order History</Text>
                 </Pressable>
 
-                <Pressable style={styles.headerBtn}>
+                <Pressable style={styles.headerBtn} onPress={logout}>
                     <Text>Log out</Text>
                 </Pressable>
 

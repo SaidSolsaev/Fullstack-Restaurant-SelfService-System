@@ -9,15 +9,15 @@ export const getAllOrders = async (req, res) => {
         const orders = await Order.findAll({
             include: [
                 {
-                    model: OrderItems, // Include OrderItems
+                    model: OrderItems,
                     as: 'orderItems',
                     include: [
                         {
-                            model: MenuItem, // Include MenuItem through OrderItems
-                            attributes: ['id', 'name', 'price'],
+                            model: MenuItem,
+                            attributes: ['id', 'name', 'price', 'image_url'],
                         },
                     ],
-                    attributes: ['quantity', 'addOns'], // Include additional info from OrderItems
+                    attributes: ['quantity', 'addOns'],
                 }
             ],
         });
@@ -62,6 +62,7 @@ export const getOrderByOrderNumber = async (req, res) => {
                 itemId: orderItem.menuItem.id,
                 itemName: orderItem.menuItem.name,
                 quantity: orderItem.quantity,
+                
                 addOns: orderItem.addOns
             }))
         };
@@ -137,7 +138,6 @@ export const createOrder = async (req, res) => {
         res.status(201).json(createdOrder);
     } catch (error) {
         res.status(500).json({ error: 'Error creating order', details: error.message });
-        console.log(error);
     }
 };
 

@@ -41,5 +41,5 @@ sequelize.sync({ alter: true})
         app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
     })
     .catch((error) => {
-        console.log("Error synching DB", error);
+        console.error("Error synching DB", error);
     })

@@ -17,16 +17,17 @@ export const handleLogin = async (email, password) => {
         });
 
         if (response.status === 200){
-            console.log('Login success', response.data);
             return response.data;
         } else{
             return null;
         }
 
-    
     } catch (error) {
-        console.error('Login error:', error);
-        Alert.alert('Login Failed', 'An error occurred. Please try again.');
+        if (error.response && error.response.data && error.response.data.error) {
+            return { error: error.response.data.error };
+        } else {
+            return { error: 'An error occurred. Please try again.' };
+        }
     }
 }
 

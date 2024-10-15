@@ -24,7 +24,18 @@ function RootNavigator() {
         <Stack.Navigator 
             initialRouteName="MainScreen"
             screenOptions={{
-                headerShown: true
+                headerShown: true,
+                headerStyle: {
+                    backgroundColor: "#333",
+                    borderWidth: 0,
+                },
+                headerTintColor: "#fff",
+                headerTitleStyle: {
+                    color: "#fff",
+                    fontWeight: "500",
+                    fontSize: 18
+                }
+                
             }}
         >
         

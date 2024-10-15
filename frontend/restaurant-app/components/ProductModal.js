@@ -11,7 +11,7 @@ import Checkbox from 'expo-checkbox';
 const ProductModal = ({visible, product, onClose, onAddToCart}) => {
     const [selectedAddOns, setSelectedAddOns] = useState([]);
 
-    if (!product) return <Text>No product!</Text>;
+    if (!product) return null;
 
     let exampleProduct = null;
     if (product.Category.name === 'Burgers'){

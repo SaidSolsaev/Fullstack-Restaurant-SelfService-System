@@ -8,6 +8,7 @@ export const AuthContext = createContext();
 export const AuthProvider = ({children}) => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     const saveToken = async (token) => {
         if (Platform.OS === 'web') {
@@ -51,9 +52,13 @@ export const AuthProvider = ({children}) => {
     const login = async (email, password) => {
         const result = await handleLogin(email, password);
         
-        if (result) {
+        if (result && result.access_token) {
             await saveToken(result.access_token);
             setIsLoggedIn(true);
+            setError(null);
+            navigation.replace('MainScreen')
+        }else if(result && result.error){
+            setError(result.error)
         }
     }
 
@@ -65,7 +70,7 @@ export const AuthProvider = ({children}) => {
     };
 
     return (
-        <AuthContext.Provider value={{ isLoggedIn, isLoading, login, logout }}>
+        <AuthContext.Provider value={{error, isLoggedIn, isLoading, login, logout }}>
             {children}
         </AuthContext.Provider>
     );

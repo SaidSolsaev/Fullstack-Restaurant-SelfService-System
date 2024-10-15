@@ -1,4 +1,4 @@
-import { Modal, StyleSheet, Text, View, Dimensions, Pressable, ScrollView, Platform } from 'react-native'
+import { Modal, StyleSheet, Text, View, Dimensions, Pressable, ScrollView, Alert } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import {Audio} from "expo-av";
 import { generatePDF } from '../helpers/generatePdf';
@@ -14,6 +14,7 @@ const NewOrderModal = ({isVisible, onConfirm, onCancel, orderDetails}) => {
 
     useEffect(() => {
         if (isVisible){
+            configureAudio();
             playSound();
         }
 
@@ -21,6 +22,17 @@ const NewOrderModal = ({isVisible, onConfirm, onCancel, orderDetails}) => {
             stopSound();
         };
     }, [isVisible]);
+
+    const configureAudio = async () => {
+        await Audio.setAudioModeAsync({
+            allowsRecordingIOS: false,
+            interruptionModeIOS: Audio.INTERRUPTION_MODE_IOS_DO_NOT_MIX,
+            playsInSilentModeIOS: true,
+            shouldDuckAndroid: true,
+            interruptionModeAndroid: Audio.INTERRUPTION_MODE_IOS_DO_NOT_MIX,
+            playThroughEarpieceAndroid: false,
+        });
+    };
 
     const playSound = async () => {
         const {sound} = await Audio.Sound.createAsync(
@@ -38,14 +50,20 @@ const NewOrderModal = ({isVisible, onConfirm, onCancel, orderDetails}) => {
     };
 
     const handleConfirm = () => {
-        stopSound();
-        generatePDF(orderDetails);
-        onConfirm(selectedTime);
+        if (selectedTime){
+            stopSound();
+            generatePDF(orderDetails);
+            onConfirm(selectedTime);
+            setSelectedTime(null);
+        }else{
+            Alert.alert('Error', 'Select Estimated Time')
+        }
     };
     
     const handleCancel = () => {
         stopSound();
         onCancel();
+        setSelectedTime(null);
     };
 
 

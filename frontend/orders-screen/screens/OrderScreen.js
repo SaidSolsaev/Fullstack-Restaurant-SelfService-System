@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, FlatList, ScrollView, Button } from 'react-native'
+import { View, Text, StyleSheet, FlatList } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { fetchOrdersFromAPI, saveOrdersToStorage, loadOrdersFromStorage } from '../service/api/ordersService'
 import moment from 'moment/moment'
@@ -48,13 +48,13 @@ const OrderScreen = () => {
             setDoneOrders(prevDoneOrders => prevDoneOrders.filter(order => 
                 order.orderNumber !== orderNumber
             ));
-        }, 600000)
+        }, 3 * 60 * 1000)
     };
 
     useEffect(() => {
         const interval = setInterval(() => {
             fetchAndSaveOrders();
-        }, 5000);
+        }, 5000)
 
         return () => clearInterval(interval);
     }, []);

@@ -18,7 +18,7 @@ export const fetchOrdersFromAPI = async () => {
     }
 };
 
-// Save orders to AsyncStorage
+
 export const saveOrdersToStorage = async (orders) => {
     try {
         await AsyncStorage.setItem(ORDER_STORAGE_KEY, JSON.stringify(orders));
@@ -27,7 +27,7 @@ export const saveOrdersToStorage = async (orders) => {
     }
 };
 
-// Load orders from AsyncStorage
+
 export const loadOrdersFromStorage = async () => {
     try {
         const storedOrders = await AsyncStorage.getItem(ORDER_STORAGE_KEY);

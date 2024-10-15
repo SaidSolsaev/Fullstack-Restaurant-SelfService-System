@@ -87,29 +87,23 @@ export const handlePaymentCallback = async (orderId, paymentDetails) => {
     const latestTransaction = paymentDetails.transactionLogHistory[0];
 
     if (!latestTransaction) {
-        console.log(`No transaction log found for order: ${orderId}`);
+        console.error(`No transaction log found for order: ${orderId}`);
         return { status: 'unknown' };
     }
 
     const paymentStatus = latestTransaction.operation;
-    console.log(`Payment callback received for order: ${orderId}`, paymentDetails);
 
     if (paymentStatus === 'CANCEL') {
-        console.log(`Payment for order ${orderId} ${paymentStatus}.`);
         return { status: 'cancelled' };
     } else if (paymentStatus === 'VOID') {
-        console.log(`Payment for order ${orderId} ${paymentStatus}.`);
         return { status: 'void' };
     } else if (paymentStatus === 'SALE') {
-        console.log(`Payment for order ${orderId} ${paymentStatus}.`);
         return { status: 'completed' };
     } else if (paymentStatus === 'RESERVE') {
         return { status: 'reserved' };
     } else if(paymentStatus === 'INITIATE'){
-        console.log(`Payment for order ${orderId} ${paymentStatus}.`);
         return {status: 'starting'}
     } else {
-        console.log(`Unknown status: ${paymentStatus}`);
         return {status: paymentStatus}
     }
 };
