@@ -21,7 +21,7 @@ const Admin = sequelize.define('Admin', {
     timestamps: true,
 });
 
-// Admin er knyttet til en restaurant
+
 Admin.belongsTo(Restaurant, { foreignKey: 'restaurantId' });
 
 export default Admin;

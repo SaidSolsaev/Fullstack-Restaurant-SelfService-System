@@ -12,7 +12,7 @@ const Menu = sequelize.define('Menu', {
     timestamps: true,
 });
 
-// En restaurant kan ha én meny
+
 Menu.belongsTo(Restaurant, { foreignKey: 'restaurantId' });
 Restaurant.hasOne(Menu, { foreignKey: 'restaurantId' });
 

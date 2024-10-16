@@ -58,7 +58,7 @@ const OrderItems = sequelize.define('OrderItems', {
 
 Order.hasMany(OrderItems, {
     foreignKey: 'orderId',
-    as: 'orderItems',  // Alias for the relation
+    as: 'orderItems',
 });
 
 OrderItems.belongsTo(Order, {

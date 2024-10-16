@@ -34,7 +34,7 @@ const MenuItem = sequelize.define('MenuItem', {
     timestamps: true,
 });
 
-// Knytt MenuItem til Menu og Category
+
 MenuItem.belongsTo(Menu, { foreignKey: 'menuId' });
 Menu.hasMany(MenuItem, { foreignKey: 'menuId' });
 
