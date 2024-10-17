@@ -11,6 +11,10 @@ const Category = sequelize.define('Category', {
         type: DataTypes.STRING,
         allowNull: false,
     },
+    restaurantId: {
+        type: DataTypes.INTEGER,
+        references: { model: 'Restaurants', key: 'id' },
+    }
 });
 
 export default Category;

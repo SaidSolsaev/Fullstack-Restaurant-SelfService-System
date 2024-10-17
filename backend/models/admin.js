@@ -17,6 +17,10 @@ const Admin = sequelize.define('Admin', {
         type: DataTypes.STRING,
         allowNull: false,
     },
+    restaurantId: {
+        type: DataTypes.INTEGER,
+        references: { model: 'Restaurants', key: 'id' },
+    }
 }, {
     timestamps: true,
 });

@@ -32,20 +32,18 @@ export const loginAdmin = async (req, res, next) => {
         }
 
         const isPasswordValid = await bcrypt.compare(password, admin.password);
+        
         if (!isPasswordValid) {
             return res.status(401).json({ error: 'Invalid password. Please Try Again' });
         }
 
-        const token = jwt.sign({ id: admin.id, email: admin.email, restaurantId: admin.restaurantId }, process.env.JWT_SECRET, {
+        const token = jwt.sign({ 
+            id: admin.id, 
+            email: admin.email, 
+            restaurantId: admin.restaurantId }, process.env.JWT_SECRET, {
             expiresIn: '72h',
         });
 
-        
-        res.cookie('access_token', token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            maxAge: 72 * 60 * 60 * 1000  // Cookie varer i 72 timer
-        });
 
         res.status(200).json({ 
             message: 'Logged in successfully',
@@ -58,7 +56,6 @@ export const loginAdmin = async (req, res, next) => {
 
 
 export const logoutAdmin = (req, res, next) => {
-    res.clearCookie('jwt');
     res.status(200).json({ message: 'Logged out successfully' });
 };
 

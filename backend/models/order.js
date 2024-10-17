@@ -29,6 +29,10 @@ const Order = sequelize.define('Orders', {
         type: DataTypes.STRING,
         allowNull: true,
     },
+    restaurantId: {
+        type: DataTypes.INTEGER,
+        references: { model: 'Restaurants', key: 'id' },
+    }
 }, {
     timestamps: true,
 });

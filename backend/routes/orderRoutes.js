@@ -4,7 +4,7 @@ import { authMiddleware, verifyDeviceKey } from '../middleware/authMiddleware.js
 
 const router = express.Router();
 
-router.get("/orders", getAllOrders);
+router.get("/orders", authMiddleware ,getAllOrders);
 
 router.get("/orders/:id", getOrderById);
 

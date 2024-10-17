@@ -8,6 +8,10 @@ const Menu = sequelize.define('Menu', {
         primaryKey: true,
         autoIncrement: true,
     },
+    restaurantId: {
+        type: DataTypes.INTEGER,
+        references: { model: 'Restaurants', key: 'id' },
+    }
 }, {
     timestamps: true,
 });

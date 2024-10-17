@@ -30,6 +30,10 @@ const MenuItem = sequelize.define('MenuItem', {
         type: DataTypes.DECIMAL(5, 2),
         defaultValue: 0,
     },
+    restaurantId: {
+        type: DataTypes.INTEGER,
+        references: { model: 'Restaurants', key: 'id' },
+    }
 }, {
     timestamps: true,
 });
