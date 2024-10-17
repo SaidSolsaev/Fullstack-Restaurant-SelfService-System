@@ -2,8 +2,10 @@ import Restaurant from "../models/restaurant.js";
 
 
 export const getRestaurants = async (req, res, next) => {
+    const restaurantId = req.user.restaurantId;
+
     try {
-        const restaurants = await Restaurant.findAll();
+        const restaurants = await Restaurant.findAll({where: {id: restaurantId}});
         res.json(restaurants);
     } catch (error) {
         next(error)

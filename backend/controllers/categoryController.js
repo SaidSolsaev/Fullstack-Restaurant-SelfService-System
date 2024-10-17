@@ -18,7 +18,7 @@ export const getCategoryById = async (req, res, next) => {
 };
 
 export const getAllCategories = async (req, res, next) => {
-    const restaurantId = req.user.restaurantId;
+    const restaurantId = 1;
 
     try {
         const categories = await Category.findAll({where: {restaurantId}});

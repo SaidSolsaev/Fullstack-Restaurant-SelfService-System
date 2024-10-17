@@ -1,13 +1,13 @@
 import express from 'express';
 import { createMenuItem, getAllMenuItems, deleteMenuItem, updateMenuItem, getMenuItemById } from '../controllers/menuItemController.js';
-import { authMiddleware } from '../middleware/authMiddleware.js';
+import { authMiddleware, validateDevice, verifyDeviceKey } from '../middleware/authMiddleware.js';
 import upload from '../middleware/uploadMiddleware.js';
 
 const router = express.Router();
 
-router.get('/menu-items', getAllMenuItems);
+router.get('/menu-items', validateDevice, getAllMenuItems);
 
-router.get("/menu-items/:id", getMenuItemById);
+router.get("/menu-items/:id", authMiddleware, getMenuItemById);
 
 router.post('/menu-items', authMiddleware,  upload.single('image'), createMenuItem);
 

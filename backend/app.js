@@ -12,6 +12,7 @@ import cookieParser from 'cookie-parser';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import paymentRouter from './routes/paymentRoute.js';
+import deviceRoutes from "./routes/deviceRoutes.js";
 import errorHandler from "./utils/errorHandler.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -33,7 +34,7 @@ app.use('/api', orderRoutes);
 app.use('/api', adminRoutes);
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/api/payment', paymentRouter);
-
+app.use('/api', deviceRoutes)
 app.use(errorHandler);
 
 const PORT = 3000;

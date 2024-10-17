@@ -1,10 +1,10 @@
 import { getRestaurants, createRestaurant, updateRestaurant, deleteRestaurant, getRestaurantById, getAdminRestaurant } from '../controllers/restaurantController.js';
 import express from "express"
-import { authMiddleware } from '../middleware/authMiddleware.js';
+import { authMiddleware, validateDevice } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-router.get("/restaurants", getRestaurants);
+router.get("/restaurants", validateDevice, getRestaurants);
 
 router.get("/restaurants/:id", getRestaurantById);
 

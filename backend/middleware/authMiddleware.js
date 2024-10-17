@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import Device from '../models/device.js';
 
 export const authMiddleware = (req, res, next) => {
     const authHeader = req.headers.authorization;
@@ -21,10 +22,28 @@ export const authMiddleware = (req, res, next) => {
 
 export const verifyDeviceKey = (req, res, next) => {
     const deviceKey = req.headers['x-device-key'];
+    const restaurantId = req.headers['x-restaurant-id'];
 
     if (!deviceKey || deviceKey !== process.env.DEVICE_SECRET_KEY) {
         return res.status(403).json({error: 'Unathorized device'});
     }
 
+    req.user = req.user || {}
+    req.user.restaurantId = restaurantId
+
     next()
 };
+
+export const validateDevice = async (req, res, next) => {
+    const deviceKey = req.headers["x-device-key"]
+    console.log("x-device-key", deviceKey);
+
+    const device = await Device.findOne({where: { deviceKey: deviceKey }});
+
+    if (!device){
+        return res.status(403).json({ error: 'Invalid device' });
+    }
+    req.user = req.user || {}
+    req.user.restaurantId = device.restaurantId;
+    next();
+}

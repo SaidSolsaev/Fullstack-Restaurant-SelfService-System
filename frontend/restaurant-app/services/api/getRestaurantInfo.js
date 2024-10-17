@@ -3,10 +3,19 @@ import { Platform } from "react-native";
 const URL = Platform.OS === 'web' 
     ? 'http://localhost:3000'
     : 'https://miserably-clever-toucan.ngrok-free.app'
+;
+
 
 export const getRestaurantInfo = async () => {
     try {
-        const response = await fetch(`${URL}/api/restaurants/1`);
+        
+        const response = await fetch(`${URL}/api/restaurants`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-device-key': 'sedik123'
+            }
+        });
         const json = await response.json();
         
         return json;
@@ -18,7 +27,12 @@ export const getRestaurantInfo = async () => {
 export const getMenuItems = async () => {
     try {
        
-        const response = await fetch(`${URL}/api/menu-items`);
+        const response = await fetch(`${URL}/api/menu-items`, {
+            headers: {
+                'Content-Type': 'application/json',
+                'x-device-key': 'sedik123',
+            },
+        });
 
         
 
