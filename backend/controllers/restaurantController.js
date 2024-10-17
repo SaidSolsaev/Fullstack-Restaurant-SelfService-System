@@ -1,16 +1,16 @@
 import Restaurant from "../models/restaurant.js";
 
 
-export const getRestaurants = async (req, res) => {
+export const getRestaurants = async (req, res, next) => {
     try {
         const restaurants = await Restaurant.findAll();
         res.json(restaurants);
     } catch (error) {
-        res.status(500).json({ error: 'Failed to fetch restaurants' });
+        next(error)
     }
 };
 
-export const getRestaurantById = async (req, res) => {
+export const getRestaurantById = async (req, res, next) => {
     const { id } = req.params;
 
     try {
@@ -20,11 +20,11 @@ export const getRestaurantById = async (req, res) => {
         }
         res.status(200).json(restaurant);
     } catch (error) {
-        res.status(500).json({ error: 'Error fetching restaurant' });
+        next(error)
     }
 };
 
-export const createRestaurant = async (req, res) => {
+export const createRestaurant = async (req, res, next) => {
     const { name, address, phone_number } = req.body;
 
     try {
@@ -35,11 +35,11 @@ export const createRestaurant = async (req, res) => {
         });
         res.status(201).json(newRestaurant);
     } catch (error) {
-        res.status(500).json({ error: 'Error creating restaurant' });
+        next(error)
     }
 };
 
-export const deleteRestaurant = async (req, res) => {
+export const deleteRestaurant = async (req, res, next) => {
     const { id } = req.params;
 
     try {
@@ -51,11 +51,11 @@ export const deleteRestaurant = async (req, res) => {
         await restaurant.destroy();
         res.status(200).json({ message: 'Restaurant deleted successfully' });
     } catch (error) {
-        res.status(500).json({ error: 'Error deleting restaurant' });
+        next(error)
     }
 };
 
-export const updateRestaurant = async (req, res) => {
+export const updateRestaurant = async (req, res, next) => {
     const { id } = req.params;
     const { name, address, phone_number } = req.body;
 
@@ -72,6 +72,6 @@ export const updateRestaurant = async (req, res) => {
         await restaurant.save();
         res.status(200).json(restaurant);
     } catch (error) {
-        res.status(500).json({ error: 'Error updating restaurant' });
+        next(error)
     }
 };

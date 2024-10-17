@@ -4,7 +4,7 @@ import { OrderItems } from '../models/order.js';
 import { generateOrderItemNumber, generateOrderNumber } from '../utils/helpers.js';
 import sequelize from '../config/db.js';
 
-export const getAllOrders = async (req, res) => {
+export const getAllOrders = async (req, res, next) => {
     try {
         const orders = await Order.findAll({
             include: [
@@ -24,12 +24,11 @@ export const getAllOrders = async (req, res) => {
 
         res.status(200).json(orders);
     } catch (error) {
-        console.error('Error fetching orders:', error.message);
-        res.status(500).json({ error: 'Error fetching orders', details: error.message });
+        next(error)
     }
 };
 
-export const getOrderByOrderNumber = async (req, res) => {
+export const getOrderByOrderNumber = async (req, res, next) => {
     const { orderNumber } = req.params;
 
     try {
@@ -69,12 +68,11 @@ export const getOrderByOrderNumber = async (req, res) => {
 
         res.status(200).json(formattedOrder);
     } catch (error) {
-        console.error('Error fetching order by order number:', error);
-        res.status(500).json({ error: 'Error fetching order' });
+        next(error)
     }
 }
 
-export const getOrderById = async (req, res) => {
+export const getOrderById = async (req, res, next) => {
     try {
         const order = await Order.findByPk(id, {
             include: [
@@ -96,11 +94,11 @@ export const getOrderById = async (req, res) => {
         }
         res.status(200).json(order);
     } catch (error) {
-        res.status(500).json({ error: 'Error fetching order' });
+        next(error)
     }
 };
 
-export const createOrder = async (req, res) => {
+export const createOrder = async (req, res, next) => {
     const { items, phoneNumber, restaurantId, totalAmount } = req.body;
 
     const transaction = await sequelize.transaction();
@@ -137,12 +135,12 @@ export const createOrder = async (req, res) => {
 
         res.status(201).json(createdOrder);
     } catch (error) {
-        res.status(500).json({ error: 'Error creating order', details: error.message });
+        next(error)
     }
 };
 
 
-export const updateOrder = async (req, res) => {
+export const updateOrder = async (req, res, next) => {
     const { id } = req.params;
     const { status, estimatedTime } = req.body;
 
@@ -158,11 +156,11 @@ export const updateOrder = async (req, res) => {
         await order.save();
         res.status(200).json(order);
     } catch (error) {
-        res.status(500).json({ error: 'Error updating order' });
+        next(error)
     }
 };
 
-export const deleteOrder = async (req, res) => {
+export const deleteOrder = async (req, res, next) => {
     const { id } = req.params;
 
     try {
@@ -174,6 +172,6 @@ export const deleteOrder = async (req, res) => {
         await order.destroy();
         res.status(200).json({ message: 'Order deleted successfully' });
     } catch (error) {
-        res.status(500).json({ error: 'Error deleting order' });
+        next(error)
     }
 };

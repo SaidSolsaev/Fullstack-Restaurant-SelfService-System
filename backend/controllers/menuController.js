@@ -1,16 +1,16 @@
 import Menu from '../models/menu.js';
 import Restaurant from '../models/restaurant.js';
 
-export const getAllMenus = async (req, res) => {
+export const getAllMenus = async (req, res, next) => {
     try {
         const menus = await Menu.findAll();
         res.status(200).json(menus);
     } catch (error) {
-        res.status(500).json({ error: 'Error fetching menus' });
+        next(error);
     }
 };
 
-export const getMenuById = async (req, res) => {
+export const getMenuById = async (req, res, next) => {
     const { id } = req.params;
 
     try {
@@ -20,12 +20,12 @@ export const getMenuById = async (req, res) => {
         }
         res.status(200).json(menu);
     } catch (error) {
-        res.status(500).json({ error: 'Error fetching menu' });
+        next(error)
     }
 };
 
 
-export const createMenu = async (req, res) => {
+export const createMenu = async (req, res, next) => {
     const { restaurantId } = req.body;
 
     try {
@@ -39,20 +39,20 @@ export const createMenu = async (req, res) => {
         });
         res.status(201).json(newMenu);
     } catch (error) {
-        res.status(500).json({ error: 'Error creating menu' });
+        next(error)
     }
 };
 
-export const getMenu = async(req, res) => {
+export const getMenu = async(req, res, next) => {
     try {
         const menu = await Menu.findAll();
         res.json(menu)
     } catch (error) {
-        res.status(500).json({ error: 'Failed to fetch Menu' });
+        next(error)
     }
 }
 
-export const deleteMenu = async(req, res) => {
+export const deleteMenu = async(req, res, next) => {
     const { id } = req.params;
     
     try {
@@ -65,6 +65,6 @@ export const deleteMenu = async(req, res) => {
         await menu.destroy();
         res.status(200).json({ message: 'Menu deleted successfully' });
     } catch (error) {
-        res.status(500).json({ error: 'Error deleting menu' });
+        next(error)
     }
 }

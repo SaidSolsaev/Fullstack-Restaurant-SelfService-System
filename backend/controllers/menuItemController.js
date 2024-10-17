@@ -9,7 +9,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 
-export const getAllMenuItems = async(req, res) => {
+export const getAllMenuItems = async(req, res, next) => {
     try {
         const { category } = req.query;
         let whereCondition = {};
@@ -32,12 +32,11 @@ export const getAllMenuItems = async(req, res) => {
         res.setHeader('Content-Type', 'application/json');
         res.status(200).json(items);
     } catch (error) {
-        res.status(500).json({ error: 'Failed to fetch Menu Items' });
-        console.error('Error fetching menu items:', error);
+        next(error)
     }
 }
 
-export const getMenuItemById = async (req, res) => {
+export const getMenuItemById = async (req, res, next) => {
     const { id } = req.params;
 
     try {
@@ -47,11 +46,11 @@ export const getMenuItemById = async (req, res) => {
         }
         res.status(200).json(menuItem);
     } catch (error) {
-        res.status(500).json({ error: 'Error fetching menu item' });
+        next(error)
     }
 };
 
-export const createMenuItem = async (req, res) => {
+export const createMenuItem = async (req, res, next) => {
     const { name, description, price, menuId, categoryId, discount } = req.body;
 
     try {
@@ -79,11 +78,11 @@ export const createMenuItem = async (req, res) => {
 
         res.status(201).json(newMenuItem);
     } catch (error) {
-        res.status(500).json({ error: 'Error creating menu item' });
+        next(error)
     }
 };
 
-export const updateMenuItem = async (req, res) => {
+export const updateMenuItem = async (req, res, next) => {
     const { id } = req.params; 
     const { name, description, price, categoryId, discount } = req.body;
     
@@ -105,7 +104,6 @@ export const updateMenuItem = async (req, res) => {
 
         
         if (req.file) {
-            // Slett det gamle bildet
             if (menuItem.image_url) {
                 const oldImagePath = path.join(__dirname, '..', menuItem.image_url);
                 fs.unlink(oldImagePath, (err) => {
@@ -114,7 +112,7 @@ export const updateMenuItem = async (req, res) => {
                     }
                 });
             }
-            // Lagre det nye bildet
+
             image_url = `/uploads/${req.file.filename}`;
         }
         
@@ -128,12 +126,12 @@ export const updateMenuItem = async (req, res) => {
         await menuItem.save();
         res.status(200).json(menuItem);
     } catch (error) {
-        res.status(500).json({ error: 'Error updating menu item' });
+        next(error);
     }
 };
 
 
-export const deleteMenuItem = async (req, res) => {
+export const deleteMenuItem = async (req, res, next) => {
     const { id } = req.params; 
 
     try {
@@ -154,6 +152,6 @@ export const deleteMenuItem = async (req, res) => {
         await menuItem.destroy();
         res.status(200).json({ message: 'MenuItem deleted successfully' });
     } catch (error) {
-        res.status(500).json({ error: 'Error deleting menu item' });
+        next(error)
     }
 };

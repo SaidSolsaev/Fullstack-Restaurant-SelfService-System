@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs';
 import jwt from "jsonwebtoken";
 
 
-export const createAdmin = async (req, res) => {
+export const createAdmin = async (req, res, next) => {
     const { email, password, restaurantId } = req.body;
 
     try {
@@ -17,11 +17,11 @@ export const createAdmin = async (req, res) => {
 
         res.status(201).json(newAdmin);
     } catch (error) {
-        res.status(500).json({ error: 'Error creating admin' });
+        next(error);
     }
 };
 
-export const loginAdmin = async (req, res) => {
+export const loginAdmin = async (req, res, next) => {
     const { email, password } = req.body;
 
     try {
@@ -52,12 +52,12 @@ export const loginAdmin = async (req, res) => {
             access_token: token,
         });
     } catch (error) {
-        res.status(500).json({ error: 'An error occurred. Please try again.' });
+        next(error)
     }
 };
 
 
-export const logoutAdmin = (req, res) => {
+export const logoutAdmin = (req, res, next) => {
     res.clearCookie('jwt');
     res.status(200).json({ message: 'Logged out successfully' });
 };
@@ -82,11 +82,11 @@ export const updateAdmin = async (req, res) => {
         await admin.save();
         res.status(200).json(admin);
     } catch (error) {
-        res.status(500).json({ error: 'Error updating admin' });
+        next(error)
     }
 };
 
-export const deleteAdmin = async (req, res) => {
+export const deleteAdmin = async (req, res, next) => {
     const { id } = req.params;
 
     try {
@@ -98,6 +98,6 @@ export const deleteAdmin = async (req, res) => {
         await admin.destroy();
         res.status(200).json({ message: 'Admin deleted successfully' });
     } catch (error) {
-        res.status(500).json({ error: 'Error deleting admin' });
+        next(error)
     }
 };

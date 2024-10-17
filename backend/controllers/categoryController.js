@@ -1,6 +1,6 @@
 import Category from '../models/category.js';
 
-export const getCategoryById = async (req, res) => {
+export const getCategoryById = async (req, res, next) => {
     const { id } = req.params;
 
     try {
@@ -10,31 +10,32 @@ export const getCategoryById = async (req, res) => {
         }
         res.status(200).json(category);
     } catch (error) {
-        res.status(500).json({ error: 'Error fetching category' });
+        next(error)
     }
 };
 
-export const getAllCategories = async (req, res) => {
+export const getAllCategories = async (req, res, next) => {
     try {
         const categories = await Category.findAll();
         res.status(200).json(categories);
     } catch (error) {
-        res.status(500).json({ error: 'Error fetching categories' });
+        next(error)
+        
     }
 };
 
-export const createCategory = async (req, res) => {
+export const createCategory = async (req, res, next) => {
     const { name } = req.body;
 
     try {
         const newCategory = await Category.create({ name });
         res.status(201).json(newCategory);
     } catch (error) {
-        res.status(500).json({ error: 'Error creating category' });
+        next(error)
     }
 };
 
-export const deleteCategory = async (req, res) => {
+export const deleteCategory = async (req, res, next) => {
     const { id } = req.params;
 
     try {
@@ -46,11 +47,11 @@ export const deleteCategory = async (req, res) => {
         await category.destroy();
         res.status(200).json({ message: 'Category deleted successfully' });
     } catch (error) {
-        res.status(500).json({ error: 'Error deleting category' });
+        next(error)
     }
 };
 
-export const updateCategory = async (req, res) => {
+export const updateCategory = async (req, res, next) => {
     const { id } = req.params;
     const { name } = req.body;
 
@@ -64,6 +65,6 @@ export const updateCategory = async (req, res) => {
         await category.save();
         res.status(200).json(category);
     } catch (error) {
-        res.status(500).json({ error: 'Error updating category' });
+        next(error);
     }
 };
