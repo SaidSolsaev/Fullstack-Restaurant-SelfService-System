@@ -2,8 +2,10 @@ import Menu from '../models/menu.js';
 import Restaurant from '../models/restaurant.js';
 
 export const getAllMenus = async (req, res, next) => {
+    const restaurantId = req.user.restaurantId;
+
     try {
-        const menus = await Menu.findAll();
+        const menus = await Menu.findAll({where: {restaurantId}});
         res.status(200).json(menus);
     } catch (error) {
         next(error);
@@ -12,9 +14,10 @@ export const getAllMenus = async (req, res, next) => {
 
 export const getMenuById = async (req, res, next) => {
     const { id } = req.params;
+    const restaurantId = req.user.restaurantId;
 
     try {
-        const menu = await Menu.findByPk(id);
+        const menu = await Menu.findOne({where: {id, restaurantId}});
         if (!menu) {
             return res.status(404).json({ error: 'Menu not found' });
         }
@@ -26,7 +29,7 @@ export const getMenuById = async (req, res, next) => {
 
 
 export const createMenu = async (req, res, next) => {
-    const { restaurantId } = req.body;
+    const restaurantId = req.user.restaurantId;
 
     try {
         const restaurant = await Restaurant.findByPk(restaurantId);
@@ -43,20 +46,14 @@ export const createMenu = async (req, res, next) => {
     }
 };
 
-export const getMenu = async(req, res, next) => {
-    try {
-        const menu = await Menu.findAll();
-        res.json(menu)
-    } catch (error) {
-        next(error)
-    }
-}
+
 
 export const deleteMenu = async(req, res, next) => {
     const { id } = req.params;
+    const restaurantId = req.user.restaurantId;
     
     try {
-        const menu = Menu.findByPk()
+        const menu = Menu.findOne({where: {restaurantId, id}})
 
         if (!menu) {
             return res.status(404).json({ error: 'Menu not found' });

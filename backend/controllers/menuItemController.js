@@ -10,14 +10,14 @@ const __dirname = path.dirname(__filename);
 
 
 export const getAllMenuItems = async(req, res, next) => {
+    const restaurantId = req.user.restaurantId;
+
     try {
         const { category } = req.query;
-        let whereCondition = {};
+        let whereCondition = { restaurantId: restaurantId, };
 
         if (category) {
-            whereCondition = {
-                '$Category.name$': category
-            };
+            whereCondition['$Category.name$'] = category
         }
 
         const items = await MenuItem.findAll({
@@ -38,9 +38,10 @@ export const getAllMenuItems = async(req, res, next) => {
 
 export const getMenuItemById = async (req, res, next) => {
     const { id } = req.params;
+    const restaurantId = req.user.restaurantId;
 
     try {
-        const menuItem = await MenuItem.findByPk(id);
+        const menuItem = await MenuItem.findOne({where: {id, restaurantId}});
         if (!menuItem) {
             return res.status(404).json({ error: 'Menu item not found' });
         }
@@ -52,9 +53,12 @@ export const getMenuItemById = async (req, res, next) => {
 
 export const createMenuItem = async (req, res, next) => {
     const { name, description, price, menuId, categoryId, discount } = req.body;
+    const restaurantId = req.user.restaurantId;
+
 
     try {
-        const menu = await Menu.findByPk(menuId);
+        const menu = await Menu.findOne({where: {id: menuId, restaurantId: restaurantId}});
+        
         if (!menu) {
             return res.status(404).json({ error: 'Menu not found' });
         }
@@ -73,7 +77,8 @@ export const createMenuItem = async (req, res, next) => {
             image_url,
             discount,
             menuId,
-            categoryId
+            categoryId,
+            restaurantId
         });
 
         res.status(201).json(newMenuItem);
@@ -85,9 +90,10 @@ export const createMenuItem = async (req, res, next) => {
 export const updateMenuItem = async (req, res, next) => {
     const { id } = req.params; 
     const { name, description, price, categoryId, discount } = req.body;
+    const restaurantId = req.user.restaurantId;
     
     try {
-        const menuItem = await MenuItem.findByPk(id);
+        const menuItem = await MenuItem.findOne({where: {id, restaurantId}});
         if (!menuItem) {
             return res.status(404).json({ error: 'MenuItem not found' });
         }
@@ -133,9 +139,10 @@ export const updateMenuItem = async (req, res, next) => {
 
 export const deleteMenuItem = async (req, res, next) => {
     const { id } = req.params; 
-
+    const restaurantId = req.user.restaurantId;
+    
     try {
-        const menuItem = await MenuItem.findByPk(id);
+        const menuItem = await MenuItem.findOne({where: {id, restaurantId}});
         if (!menuItem) {
             return res.status(404).json({ error: 'MenuItem not found' });
         }

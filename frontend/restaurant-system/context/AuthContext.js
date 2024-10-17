@@ -9,6 +9,7 @@ export const AuthProvider = ({children}) => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [restaurant, setRestaurant] = useState(null);
 
     const saveToken = async (token) => {
         if (Platform.OS === 'web') {
@@ -55,6 +56,7 @@ export const AuthProvider = ({children}) => {
         if (result && result.access_token) {
             await saveToken(result.access_token);
             setIsLoggedIn(true);
+            setRestaurant(result.restaurant);
             setError(null);
             navigation.replace('MainScreen')
         }else if(result && result.error){
@@ -66,11 +68,12 @@ export const AuthProvider = ({children}) => {
         await handleLogout();
         await removeToken();
         setIsLoggedIn(false);
+        setRestaurant(null);
         
     };
 
     return (
-        <AuthContext.Provider value={{error, isLoggedIn, isLoading, login, logout }}>
+        <AuthContext.Provider value={{error, isLoggedIn, isLoading, login, logout, restaurant}}>
             {children}
         </AuthContext.Provider>
     );

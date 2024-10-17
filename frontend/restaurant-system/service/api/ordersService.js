@@ -5,8 +5,16 @@ import moment from 'moment';
 
 const API_URL = Platform.OS === 'web'
     ? 'http://localhost:3000'
-    : 'https://miserably-clever-toucan.ngrok-free.app';
+    : 'https://miserably-clever-toucan.ngrok-free.app'
+;
 
+const getToken = async () => {
+    if (Platform.OS === 'web') {
+        return localStorage.getItem('access_token');
+    } else {
+        return await SecureStore.getItemAsync('access_token');
+    }
+};
 
 const isToday = (dateString) => {
     const today = moment().startOf('day');
@@ -20,7 +28,13 @@ const sortOrdersByDate = (orders) => {
 
 export const fetchOrdersFromAPI = async () => {
     try {
-        const response = await axios.get(`${API_URL}/api/orders`);
+        const token = await getToken();
+
+        const response = await axios.get(`${API_URL}/api/orders`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
         const orders = response.data;
 
         const todaysOrders = orders.filter(order => isToday(order.createdAt));
@@ -35,8 +49,15 @@ export const fetchOrdersFromAPI = async () => {
 };
 
 export const getAllOrders = async () => {
+    
     try {
-        const response = await axios.get(`${API_URL}/api/orders`);
+        const token = await getToken();
+
+        const response = await axios.get(`${API_URL}/api/orders`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
         return response.data;
     } catch (error) {
         console.error("Error fetching all orders", error);
@@ -46,9 +67,15 @@ export const getAllOrders = async () => {
 
 export const updateOrderStatus = async (status, orderId, estimatedTime = 30) => {
     try {
+        const token = await getToken();
+
         const response = await axios.put(`${API_URL}/api/orders/${orderId}`, {
             status: status,
             estimatedTime: `${estimatedTime} min`,
+        }, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
         });
 
         return response.data;

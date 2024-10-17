@@ -1,4 +1,4 @@
-import { getRestaurants, createRestaurant, updateRestaurant, deleteRestaurant, getRestaurantById } from '../controllers/restaurantController.js';
+import { getRestaurants, createRestaurant, updateRestaurant, deleteRestaurant, getRestaurantById, getAdminRestaurant } from '../controllers/restaurantController.js';
 import express from "express"
 import { authMiddleware } from '../middleware/authMiddleware.js';
 
@@ -8,7 +8,9 @@ router.get("/restaurants", getRestaurants);
 
 router.get("/restaurants/:id", getRestaurantById);
 
-router.post('/restaurants', authMiddleware, createRestaurant);
+router.get("/restaurants-me", authMiddleware, getAdminRestaurant);
+
+router.post('/restaurants', createRestaurant);
 
 router.put('/restaurants/:id', authMiddleware, updateRestaurant);
 

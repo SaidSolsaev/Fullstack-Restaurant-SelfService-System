@@ -8,7 +8,7 @@ import {AuthContext} from "../context/AuthContext.js";
 const Header = () => {
     const [currentTime, setCurrentTime] = useState(moment().format('HH:mm'));
     const navigation = useNavigation()
-    const {logout} = useContext(AuthContext)
+    const {logout, restaurant} = useContext(AuthContext)
 
 
     useEffect(() => {
@@ -26,7 +26,7 @@ const Header = () => {
     return (
         <View style={styles.container}>
             <View style={styles.leftSide}>
-                <Text style={styles.logo}>Burgers Place</Text>
+                <Text style={styles.logo}>{restaurant?.name}</Text>
                 <Text style={styles.time}>{currentTime}</Text>
             </View>
 

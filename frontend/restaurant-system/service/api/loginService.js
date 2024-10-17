@@ -17,7 +17,18 @@ export const handleLogin = async (email, password) => {
         });
 
         if (response.status === 200){
-            return response.data;
+            const token = response.data.access_token;
+
+            const restaurantResponse = await axios.get(`${API_URL}/api/restaurants-me`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            return {
+                access_token: token,
+                restaurant: restaurantResponse.data
+            };
         } else{
             return null;
         }
@@ -36,7 +47,6 @@ export const handleLogout = async () => {
         const response = await axios.post(`${API_URL}/api/logout`);
 
         if (response.status === 200){
-            console.log('Login success', response.data);
             return response.data;
         } else{
             return null;
@@ -44,7 +54,10 @@ export const handleLogout = async () => {
 
     
     } catch (error) {
-        console.error('Login error:', error);
-        Alert.alert('Login Failed', 'An error occurred. Please try again.');
+        if (error.response && error.response.data && error.response.data.error) {
+            return { error: error.response.data.error };
+        } else {
+            return { error: 'An error occurred. Please try again.' };
+        }
     }
 }

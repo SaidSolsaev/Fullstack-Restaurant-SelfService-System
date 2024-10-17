@@ -5,6 +5,8 @@ import { generateOrderItemNumber, generateOrderNumber } from '../utils/helpers.j
 import sequelize from '../config/db.js';
 
 export const getAllOrders = async (req, res, next) => {
+    const restaurantId = req.user.restaurantId;
+
     try {
         const orders = await Order.findAll({
             include: [
@@ -20,6 +22,7 @@ export const getAllOrders = async (req, res, next) => {
                     attributes: ['quantity', 'addOns'],
                 }
             ],
+            where: {restaurantId}
         });
 
         res.status(200).json(orders);
@@ -30,10 +33,11 @@ export const getAllOrders = async (req, res, next) => {
 
 export const getOrderByOrderNumber = async (req, res, next) => {
     const { orderNumber } = req.params;
+    const restaurantId = req.user.restaurantId;
 
     try {
         const order = await Order.findOne({
-            where: { orderNumber },
+            where: { orderNumber, restaurantId },
             include: [
                 {
                     model: OrderItems,
@@ -41,13 +45,13 @@ export const getOrderByOrderNumber = async (req, res, next) => {
                     include: [
                         {
                             model: MenuItem,
-                            attributes: ['id', 'name'],
+                            attributes: ['id', 'name', 'image_url', 'price'],
                         },
                     ],
                     attributes: ['quantity', 'addOns'],
                 }
             ],
-            attributes: ['orderNumber', 'totalAmount'],
+            attributes: ['orderNumber', 'totalAmount', 'phoneNumber'],
         });
 
         if (!order) {
@@ -57,11 +61,13 @@ export const getOrderByOrderNumber = async (req, res, next) => {
         const formattedOrder = {
             orderNumber: order.orderNumber,
             totalAmount: order.totalAmount,
+            phoneNumber: order.phoneNumber,
             orderedItems: order.orderItems.map(orderItem => ({
                 itemId: orderItem.menuItem.id,
                 itemName: orderItem.menuItem.name,
+                itemImage: orderItem.menuItem.image_url,
+                itemPrice: orderItem.menuItem.price,
                 quantity: orderItem.quantity,
-                
                 addOns: orderItem.addOns
             }))
         };
@@ -73,8 +79,12 @@ export const getOrderByOrderNumber = async (req, res, next) => {
 }
 
 export const getOrderById = async (req, res, next) => {
+    const restaurantId = req.user.restaurantId;
+    const {id} = req.params;
+
     try {
-        const order = await Order.findByPk(id, {
+        const order = await Order.findOne({
+            where: {id, restaurantId},
             include: [
                 {
                     model: OrderItems,
@@ -82,16 +92,18 @@ export const getOrderById = async (req, res, next) => {
                     include: [
                         {
                             model: MenuItem,
-                            attributes: ['id', 'name'],
+                            attributes: ['id', 'name', 'image_url', 'price'],
                         },
                     ],
                     attributes: ['quantity', 'addOns'],
                 }
             ]
         });
+        
         if (!order) {
             return res.status(404).json({ error: 'Order not found' });
         }
+        
         res.status(200).json(order);
     } catch (error) {
         next(error)
@@ -99,8 +111,9 @@ export const getOrderById = async (req, res, next) => {
 };
 
 export const createOrder = async (req, res, next) => {
-    const { items, phoneNumber, restaurantId, totalAmount } = req.body;
-
+    const { items, phoneNumber, totalAmount } = req.body;
+    const restaurantId = req.user.restaurantId;
+    
     const transaction = await sequelize.transaction();
 
     try {
@@ -143,9 +156,11 @@ export const createOrder = async (req, res, next) => {
 export const updateOrder = async (req, res, next) => {
     const { id } = req.params;
     const { status, estimatedTime } = req.body;
-
+    const restaurantId = req.user.restaurantId;
+    
     try {
-        const order = await Order.findByPk(id);
+        const order = await Order.findOne({where: {id, restaurantId} });
+        
         if (!order) {
             return res.status(404).json({ error: 'Order not found' });
         }
@@ -162,9 +177,10 @@ export const updateOrder = async (req, res, next) => {
 
 export const deleteOrder = async (req, res, next) => {
     const { id } = req.params;
-
+    const restaurantId = req.user.restaurantId;
+    
     try {
-        const order = await Order.findByPk(id);
+        const order = await Order.findOne({where: {restaurantId}});
         if (!order) {
             return res.status(404).json({ error: 'Order not found' });
         }
