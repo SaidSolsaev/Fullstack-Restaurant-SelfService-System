@@ -180,7 +180,7 @@ export const deleteOrder = async (req, res, next) => {
     const restaurantId = req.user.restaurantId;
     
     try {
-        const order = await Order.findOne({where: {restaurantId}});
+        const order = await Order.findOne({where: {id, restaurantId}});
         if (!order) {
             return res.status(404).json({ error: 'Order not found' });
         }

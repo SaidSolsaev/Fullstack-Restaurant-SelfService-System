@@ -1,4 +1,6 @@
 import { Platform } from "react-native";
+import * as SecureStore from 'expo-secure-store';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const URL = Platform.OS === 'web' 
     ? 'http://localhost:3000'
@@ -8,12 +10,12 @@ const URL = Platform.OS === 'web'
 
 export const getRestaurantInfo = async () => {
     try {
-        
+        const token = await SecureStore.getItemAsync('deviceToken'); 
         const response = await fetch(`${URL}/api/restaurants`, {
             method: 'GET',
             headers: {
+                'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json',
-                'x-device-key': 'sedik123'
             }
         });
         const json = await response.json();
@@ -24,17 +26,47 @@ export const getRestaurantInfo = async () => {
     }
 };
 
+export const deviceLogin = async (deviceName, deviceKey) => {
+
+    try {
+        const response = await fetch(`${URL}/api/devices/login`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                deviceName: deviceName,
+                deviceKey: deviceKey
+            })
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+           
+            return { success: false, error: errorData.message };
+        }
+
+        const data = await response.json();
+
+        await SecureStore.setItemAsync('deviceToken', data.token);
+
+        return { success: true, token: data.token };
+    } catch (error) {
+        console.error('Error during login:', error);
+        return { success: false, error: 'An error occurred during login' };
+    }
+}
+
 export const getMenuItems = async () => {
     try {
-       
+        const token = await SecureStore.getItemAsync('deviceToken');
+
         const response = await fetch(`${URL}/api/menu-items`, {
             headers: {
                 'Content-Type': 'application/json',
-                'x-device-key': 'sedik123',
+                'Authorization': `Bearer ${token}`,
             },
         });
-
-        
 
         if(!response.ok){
             const text = await response.text();
@@ -52,7 +84,12 @@ export const getMenuItems = async () => {
 
 export const getCategories = async () => {
     try {
-        const response = await fetch(`${URL}/api/categories`);
+        const token = await SecureStore.getItemAsync('deviceToken');
+        const response = await fetch(`${URL}/api/categories`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            }
+        });
         const json = await response.json();
         
         return json;
@@ -62,26 +99,26 @@ export const getCategories = async () => {
 }
 
 export const createOrderBackendCall = async (cartItems, phoneNumber, totalPrice) => {
+    
     try {
-        
         const formattedItems = cartItems.map(item => ({
             menuItemId: item.id,
             quantity: item.quantity,
             addOns: item.addOns
         }));
 
-        console.log(formattedItems);
+        const token = await SecureStore.getItemAsync('deviceToken');
+
 
         const response = await fetch(`${URL}/api/orders`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'x-device-key': 'sedik123',
+                'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify({
                 items: formattedItems,
                 phoneNumber: phoneNumber,
-                restaurantId: 1,
                 totalAmount: totalPrice
             })
         });

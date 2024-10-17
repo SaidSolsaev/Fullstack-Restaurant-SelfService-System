@@ -1,19 +1,19 @@
 import express from 'express';
 import { createOrder, getAllOrders, getOrderById, updateOrder, deleteOrder, getOrderByOrderNumber } from '../controllers/orderController.js';
-import { authMiddleware, verifyDeviceKey } from '../middleware/authMiddleware.js';
+import { authMiddleware, authenticateDevice, checkEitherAuth } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-router.get("/orders", authMiddleware ,getAllOrders);
+router.get("/orders", checkEitherAuth, getAllOrders);
 
-router.get("/orders/:id", getOrderById);
+router.get("/orders/:id", authMiddleware, getOrderById);
 
-router.get('/orders/orderNumber/:orderNumber', getOrderByOrderNumber);
+router.get('/orders/orderNumber/:orderNumber',authMiddleware, getOrderByOrderNumber);
 
-router.post('/orders', verifyDeviceKey, createOrder);
+router.post('/orders', authenticateDevice, createOrder);
 
-router.put('/orders/:id', updateOrder);
+router.put('/orders/:id', authMiddleware, updateOrder);
 
-router.delete('/orders/:id', deleteOrder);
+router.delete('/orders/:id', authMiddleware, deleteOrder);
 
 export default router;

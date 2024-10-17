@@ -1,12 +1,12 @@
 import express from 'express';
 import { createCategory, updateCategory, deleteCategory, getAllCategories, getCategoryById } from '../controllers/categoryController.js';
-import { authMiddleware } from '../middleware/authMiddleware.js';
+import { authMiddleware, authenticateDevice, checkEitherAuth } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-router.get("/categories", getAllCategories);
+router.get("/categories",checkEitherAuth, getAllCategories);
 
-router.get("/categories", getCategoryById);
+router.get("/categories", checkEitherAuth, getCategoryById);
 
 router.post('/categories', authMiddleware, createCategory);
 

@@ -6,14 +6,16 @@ const router = express.Router();
 
 router.get("/restaurants", validateDevice, getRestaurants);
 
-router.get("/restaurants/:id", getRestaurantById);
+router.get("/restaurants/:id", validateDevice, getRestaurantById);
 
 router.get("/restaurants-me", authMiddleware, getAdminRestaurant);
 
-router.post('/restaurants', createRestaurant);
+//Remeber to change so only overall admin can create new restaurant
+router.post('/restaurants', authMiddleware, createRestaurant);
 
 router.put('/restaurants/:id', authMiddleware, updateRestaurant);
 
+//Remeber to change so only overall admin can create new restaurant
 router.delete('/restaurants/:id', authMiddleware, deleteRestaurant);
 
 export default router;
