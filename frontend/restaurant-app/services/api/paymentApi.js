@@ -2,6 +2,7 @@ import Constants from "expo-constants";
 
 
 export const initiateVippsPayment = async (phoneNumber, totalPrice, orderId) => {
+    
     const response = await fetch(`${Constants.expoConfig?.extra?.NGROK_URL}/api/payment/start-payment`,{
         method: 'POST',
         headers: {

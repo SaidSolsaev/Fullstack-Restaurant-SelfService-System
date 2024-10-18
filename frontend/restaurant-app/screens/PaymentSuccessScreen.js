@@ -1,28 +1,61 @@
 import { useNavigation } from '@react-navigation/native';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
+import { createOrderBackendCall } from '../services/api/getRestaurantInfo';
+import { CartContext } from '../context/CartContext';
+
 
 const PaymentSuccessScreen = ({route}) => {
     const navigation = useNavigation();
-    const { order } = route.params;
-    console.log(order);
-
+    const { cartItems, phoneNumber, totalPrice } = route.params;
+    const [orderCreated, setOrderCreated] = useState(false);
+    const {clearCart} = useContext(CartContext);
+    
     useEffect(() => {
+        const createOrder = async () => {
+            if (!orderCreated){
+                try {
+                    const order = await createOrderBackendCall(cartItems, phoneNumber, totalPrice);
+                    console.log(order)
+                    
+                    if (order){
+                        clearCart();
+                        setOrderCreated(true);
+                    } else{
+                        throw new Error('Order creation failed');
+                    }
+                } catch (error) {
+                    Alert.alert('Error', 'Failed to create order. Please try again.');
+                }
+            }
+        };
+
+        createOrder();
+
         const timer = setTimeout(() => {
-            navigation.navigate('Home');
+            navigation.reset({
+                index: 0,
+                routes: [{ name: 'Home' }],
+            });
         }, 15000);
 
         return () => clearTimeout(timer);
-    }, [navigation]);
+    }, [navigation, cartItems, phoneNumber, totalPrice, orderCreated])
+
 
 
     return (
         <View style={styles.container}>
             <View style={styles.card}>
                 <Text style={styles.successText}>Payment Successful!</Text>
-                <Text style={styles.orderIdText}>Order ID: {order.orderNumber}</Text>
-                <Text style={styles.orderInfoText}>Total: ${order.totalAmount}</Text>
-                {/* Add more order information as needed */}
+                {orderCreated ? (
+                    <>
+                        <Text style={styles.orderIdText}>Order created successfully!</Text>
+                        <Text style={styles.orderInfoText}>Thank you for your purchase.</Text>
+                    </>
+                ) : (
+                    <Text style={styles.orderInfoText}>Creating your order...</Text>
+                )}
             </View>
 
             <Pressable onPress={() => navigation.navigate('Home')} style={styles.button}>
@@ -65,6 +98,16 @@ const styles = StyleSheet.create({
     orderInfoText: {
         fontSize: 16,
         color: '#555',
+    },
+    button: {
+        backgroundColor: '#FF6347',
+        padding: 10,
+        borderRadius: 5,
+        marginTop: 20,
+    },
+    buttonText: {
+        color: '#FFF',
+        fontSize: 16,
     },
 });
 

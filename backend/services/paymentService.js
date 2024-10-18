@@ -35,7 +35,7 @@ const getAccessToken = async () => {
     }
 };
 
-export const initiatePayment = async(phoneNumber, amount, fallbackUrl, orderId) => {
+export const initiatePayment = async(phoneNumber, amount, orderId) => {
     const accessToken = await getAccessToken();
 
     const paymentData = {
@@ -51,20 +51,7 @@ export const initiatePayment = async(phoneNumber, amount, fallbackUrl, orderId) 
             value: amount * 100,
         },
         userFlow: "PUSH_MESSAGE",
-        // merchantInfo: {
-        //     merchantSerialNumber: '344925',
-        //     callbackPrefix: `https://${process.env.NGROK_URL}/api/payment/callback`,
-        //     fallBack: fallbackUrl,
-        //     consentRemovalPrefix: `https://${process.env.NGROK_URL}/api/payment/remove-consent`,
-        //     paymentType: 'MOBILE',
-        // },
-        // transaction: {
-        //     amount: amount * 100,
-        //     transactionText: 'Order payment for your purchase',
-        //     orderId: orderId,
-        // },
     };
-
 
     const idempotencyKey = `order-${orderId}-${Date.now()}`;
 
@@ -103,7 +90,7 @@ export const pollPaymentStatus = async (orderId) => {
 
     const poll = async () => {
         try {
-            const response = axios.get(
+            const response = await axios.get(
                 `${BASE_URL}/epayment/v1/payments/${orderId}`,
                 {
                     headers: {
@@ -116,7 +103,6 @@ export const pollPaymentStatus = async (orderId) => {
             );
 
             const status = response.data.state;
-            console.log(status);
 
             if (status === 'AUTHORIZED'){
                 return {status: 'completed', orderId, message: "Payment Successful!"}

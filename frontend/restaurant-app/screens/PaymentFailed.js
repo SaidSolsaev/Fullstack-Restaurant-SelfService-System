@@ -4,9 +4,9 @@ import React from 'react'
 
 
 const PaymentFailed = ({route}) => {
-    const {phoneNumber, paymentSuccess} = route.params;
+    const {phoneNumber} = route.params;
 
-    console.log('Inside Payment Failed, params: ', phoneNumber, paymentSuccess);
+    console.log('Inside Payment Failed, params: ', phoneNumber);
 
 
     return (

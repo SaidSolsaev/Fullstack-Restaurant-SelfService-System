@@ -18,40 +18,19 @@ const PaymentScreen = ({ route }) => {
         alert(`Du har valgt å betale med ${method}.`);
     };
 
-    const getPaymentStatus = async (orderId) => {
-        const intervalId = setInterval(async () => {
-            try {
-                const status = await pollPaymentStatus(orderId);
-                console.log(status)
-
-                if (status.status === 'completed') {
-                    clearInterval(intervalId);
-                    navigation.navigate('PaymentSuccessScreen');
-                } else if (status.status === 'failed' || status.status === 'cancelled') {
-                    clearInterval(intervalId);
-                    navigation.navigate('PaymentFailedScreen');
-                }
-            } catch (error) {
-                console.error('Error polling payment status:', error);
-            }
-        }, 5000); 
-    }
-
 
     const handleVippsPayment = async () => {
         try {
             const orderId = `order-${Date.now()}`;
             const data = await initiateVippsPayment(phoneNumber, totalPrice, orderId);
-
-            console.log(data);
             
 
             if (data.orderId){
-                const state = await getPaymentStatus(data.orderId);
+                const vippsOrderId = data.orderId
+                navigation.navigate('PaymentProcessing', { phoneNumber, vippsOrderId });
             }else{
                 Alert.alert('Error', 'There is no reference.');
             }
-            
         } catch (error) {
             console.error('Error initiating payment:', error);
             Alert.alert('Error', 'Failed to initiate payment');

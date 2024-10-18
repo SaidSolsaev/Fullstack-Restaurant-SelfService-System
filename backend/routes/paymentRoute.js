@@ -5,10 +5,10 @@ const router = express.Router();
 
 
 router.post('/start-payment', async (req, res) => {
-    const { phoneNumber, amount, fallbackUrl, orderId } = req.body;
+    const { phoneNumber, amount, orderId } = req.body;
     
     try {
-        const paymentResponse = await initiatePayment(phoneNumber, amount, fallbackUrl, orderId);
+        const paymentResponse = await initiatePayment(phoneNumber, amount, orderId);
         res.json(paymentResponse);
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -53,6 +53,7 @@ router.get("/poll-status/:orderId", async (req, res, next) => {
 
     try {
         const paymentState = await pollPaymentStatus(orderId);
+        console.log(paymentState)
         res.status(200).json(paymentState)
     } catch (error) {
         next(error);

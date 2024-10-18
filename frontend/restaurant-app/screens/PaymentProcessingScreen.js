@@ -1,22 +1,63 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState, useRef } from 'react';
 import { View, Text, StyleSheet, Alert, Platform, ActivityIndicator, } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { createOrderBackendCall } from '../services/api/getRestaurantInfo';
 import { CartContext } from '../context/CartContext';
-import * as Linking from "expo-linking";
-import Constants from "expo-constants";
+import { pollPaymentStatus } from '../services/api/paymentApi';
 
 
 const PaymentProcessingScreen = ({ route }) => {
     const navigation = useNavigation();
     const {cartItems, isCartReady, getTotalPrice, clearCart} = useContext(CartContext);
     const totalPrice = getTotalPrice();
-
-    const [phoneNumber, setPhoneNumber] = useState('');
-    const [vippsOrderId, setVippsOrderId] = useState(null);
+    const { phoneNumber, vippsOrderId } = route.params;
     const [isLoading, setIsLoading] = useState(true);
+    const [hasProcessedOrder, setHasProcessedOrder] = useState(false); 
 
-    const paymentNotSuccessAlert = () => {
+    const [orderProcessed, setOrderProcessed] = useState(false);
+
+    const intervalIdRef = useRef(null);
+
+    useEffect(() => {
+        const pollPayment = async () => {
+            try {
+                const status = await pollPaymentStatus(vippsOrderId);
+      
+                if (status.status === 'completed' && !orderProcessed) {
+                    setOrderProcessed(true);
+                    clearInterval(intervalIdRef.current);
+                    navigateToSuccess();
+                } else if (['failed', 'cancelled'].includes(status.status)) {
+                    setOrderProcessed(true);
+                    clearInterval(intervalIdRef.current);
+                    navigation.navigate('PaymentFail', { cartItems, phoneNumber})
+                }
+            } catch (error) {
+                console.error('Error polling payment status:', error);
+                clearInterval(intervalIdRef.current);
+                Alert.alert('Error', 'Failed to retrieve payment status.');
+            }
+        };
+      
+          
+        if (!orderProcessed) {
+            intervalIdRef.current = setInterval(pollPayment, 5000);
+        }
+      
+        return () => clearInterval(intervalIdRef.current);
+    
+    }, [vippsOrderId, orderProcessed]);
+
+    
+    const navigateToSuccess = () => {
+        clearCart();
+        setIsLoading(false);
+        navigation.navigate('PaymentSuccess', { cartItems, phoneNumber, totalPrice });
+    };
+
+    const showPaymentFailedAlert = () => {
+        setIsLoading(false);
+
         if (Platform.OS === 'web'){
             const confirmQuit = window.confirm(
                 "Payment Failed! Your payment was not successful. Please try again!",
@@ -52,84 +93,6 @@ const PaymentProcessingScreen = ({ route }) => {
         }
     }
 
-    useEffect(() => {
-
-        const getUrlParams = async () => {
-            const {orderId, phoneNumber} = route.params;
-
-            setPhoneNumber(phoneNumber);
-            setVippsOrderId(orderId);
-        }
-
-        const getUrlParamsWeb = async () => {
-            const url = await Linking.getInitialURL();
-            
-            if (url){
-                const {queryParams} = Linking.parse(url);
-                setPhoneNumber(queryParams.phoneNumber);
-                setVippsOrderId(queryParams.orderId);
-            }
-        }
-     
-        if (Platform.OS === 'web'){
-            getUrlParamsWeb();
-        }else{
-            getUrlParams();
-        }
-
-        if (isCartReady && vippsOrderId) {
-            handlePaymentCallback();
-        }
-
-    }, [isCartReady, vippsOrderId]);
-
-
-    const handlePaymentCallback = async () => {
-        try {
-
-            const paymentResponse = await fetch(`${Constants.expoConfig?.extra?.NGROK_URL}/api/payment/callback`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    orderId: vippsOrderId,
-                }),
-            });
-
-            if (!paymentResponse.ok) {
-                throw new Error('Failed to retrieve payment status from backend.');
-            }
-            
-            const { status } = await paymentResponse.json();
-
-            console.log(status)
-
-
-            setTimeout(async () => {
-                if (status === 'completed' || status === 'reserved') {
-                    
-                    const order = await createOrderBackendCall(cartItems, phoneNumber, totalPrice);
-    
-                    if (order) {
-                        clearCart();
-                        setIsLoading(false);
-                        navigation.navigate('PaymentSuccess', { paymentSuccess: true, order });
-                    } else {
-                        Alert.alert('Error', 'Failed to create order.');
-                    }
-                } else {
-                    setIsLoading(false);
-                    paymentNotSuccessAlert();
-                }
-            }, 4000)
-        
-        } catch (error) {
-            console.error('Error in payment callback:', error);
-            Alert.alert('Error', 'Something went wrong.');
-            setIsLoading(false);
-        }
-    };
 
     return (
         <View style={styles.container}>
