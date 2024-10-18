@@ -1,9 +1,9 @@
-import React, {useContext, useEffect, useState} from 'react';
-import { View, Text, Pressable, StyleSheet, Alert, Platform } from 'react-native';
+import React, {useContext,} from 'react';
+import { View, Text, Pressable, StyleSheet, Alert, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { CartContext } from '../context/CartContext';
 import { useNavigation } from '@react-navigation/native';
-import { initiateVippsPayment, pollPaymentStatus } from '../services/api/paymentApi';
+import { initiateVippsPayment } from '../services/api/paymentApi';
 
 
 const PaymentScreen = ({ route }) => {
@@ -48,7 +48,11 @@ const PaymentScreen = ({ route }) => {
                     onPress={handleVippsPayment}
                 >
 
-                    <Ionicons name="logo-vimeo" size={40} color="#fff" />
+                    <Image 
+                        style={{width: 100, height: 50, color: "white"}}
+                        source={require("../assets/vipps_logo_rgb.png")}
+
+                    />
                     <Text style={styles.buttonText}>Pay with Vipps</Text>
                 
                 </Pressable>
@@ -100,7 +104,7 @@ const styles = StyleSheet.create({
     },
     buttonText: {
         color: '#fff',
-        fontSize: 16,
+        fontSize: 18,
         fontWeight: 'bold',
         marginTop: 10,
     },

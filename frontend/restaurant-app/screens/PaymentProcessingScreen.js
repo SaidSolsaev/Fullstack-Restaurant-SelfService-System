@@ -1,23 +1,20 @@
 import React, { useContext, useEffect, useState, useRef } from 'react';
 import { View, Text, StyleSheet, Alert, Platform, ActivityIndicator, } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { createOrderBackendCall } from '../services/api/getRestaurantInfo';
 import { CartContext } from '../context/CartContext';
 import { pollPaymentStatus } from '../services/api/paymentApi';
 
 
 const PaymentProcessingScreen = ({ route }) => {
     const navigation = useNavigation();
-    const {cartItems, isCartReady, getTotalPrice, clearCart} = useContext(CartContext);
+    const {cartItems, getTotalPrice, clearCart} = useContext(CartContext);
     const totalPrice = getTotalPrice();
-    const { phoneNumber, vippsOrderId } = route.params;
+    const { phoneNumber, vippsOrderId, paymentMethod } = route.params;
     const [isLoading, setIsLoading] = useState(true);
-    const [hasProcessedOrder, setHasProcessedOrder] = useState(false); 
-
     const [orderProcessed, setOrderProcessed] = useState(false);
-
     const intervalIdRef = useRef(null);
 
+    
     useEffect(() => {
         const pollPayment = async () => {
             try {
@@ -54,44 +51,6 @@ const PaymentProcessingScreen = ({ route }) => {
         setIsLoading(false);
         navigation.navigate('PaymentSuccess', { cartItems, phoneNumber, totalPrice });
     };
-
-    const showPaymentFailedAlert = () => {
-        setIsLoading(false);
-
-        if (Platform.OS === 'web'){
-            const confirmQuit = window.confirm(
-                "Payment Failed! Your payment was not successful. Please try again!",
-            )
-
-            if (confirmQuit){
-                clearCart();
-                navigation.navigate('Home')
-            }
-        } else {
-            Alert.alert(
-                'Payment Failed', 
-                'Your payment was not successful. Please try again!',
-                [
-                    {
-                        text: "Cancel Order",
-                        onPress: () => {
-                            clearCart();
-                            navigation.navigate("Home");
-                        },
-                        style: "cancel"
-                    },
-                    {
-                        text: "Try Again",
-                        onPress: () => {
-                            navigation.navigate('Payment', {phoneNumber});
-                        },
-                        style: "destructive"
-                    }
-                ],
-                {cancelable: false}
-            );
-        }
-    }
 
 
     return (
