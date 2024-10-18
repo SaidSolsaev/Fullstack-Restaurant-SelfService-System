@@ -2,9 +2,8 @@ import React, {useContext, useEffect, useState} from 'react';
 import { View, Text, Pressable, StyleSheet, Alert, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { CartContext } from '../context/CartContext';
-import * as Linking from "expo-linking";
 import { useNavigation } from '@react-navigation/native';
-import Constants from "expo-constants";
+import { initiateVippsPayment, pollPaymentStatus } from '../services/api/paymentApi';
 
 
 const PaymentScreen = ({ route }) => {
@@ -13,75 +12,44 @@ const PaymentScreen = ({ route }) => {
     const navigation = useNavigation();
     let totalPrice = (10 * getTotalPrice()).toFixed(2);
     
-    
-    useEffect(() => {
-        const handleDeepLink = (event) => {
-            const url = event.url;
-            
-            if (url.includes('payment-processing')){
-                const {queryParams} = Linking.parse(url);
-                navigation.navigate('PaymentProcessing', {orderId: queryParams.orderId, phoneNumber: queryParams.phoneNumber})
-            }
-        };
 
-        
-        const subscription = Linking.addEventListener('url', handleDeepLink);
-
-
-        Linking.getInitialURL().then((url) => {
-            if (url && url.includes('payment-processing')){
-                
-                navigation.navigate('PaymentProcessing');
-            }
-        });
-
-        return () => {
-            subscription.remove();
-        }
-
-        
-    }, [navigation])
 
     const handlePayment = (method) => {
         alert(`Du har valgt å betale med ${method}.`);
     };
 
+    const getPaymentStatus = async (orderId) => {
+        const intervalId = setInterval(async () => {
+            try {
+                const status = await pollPaymentStatus(orderId);
+                console.log(status)
+
+                if (status.status === 'completed') {
+                    clearInterval(intervalId);
+                    navigation.navigate('PaymentSuccessScreen');
+                } else if (status.status === 'failed' || status.status === 'cancelled') {
+                    clearInterval(intervalId);
+                    navigation.navigate('PaymentFailedScreen');
+                }
+            } catch (error) {
+                console.error('Error polling payment status:', error);
+            }
+        }, 5000); 
+    }
+
 
     const handleVippsPayment = async () => {
         try {
             const orderId = `order-${Date.now()}`;
+            const data = await initiateVippsPayment(phoneNumber, totalPrice, orderId);
 
-            const fallbackUrl = Platform.OS === 'web'
-                ? `http://localhost:8081/payment-processing?phoneNumber=${phoneNumber}&orderId=${orderId}`
-                : `exp://192.168.0.170:8081/--/payment-processing?phoneNumber=${phoneNumber}&orderId=${orderId}`;
-
-            const response = await fetch(`${Constants.expoConfig?.extra?.NGROK_URL}/api/payment/start-payment`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'ngrok-skip-browser-warning': 'true'
-                },
-                body: JSON.stringify({
-                    phoneNumber: phoneNumber,
-                    amount: totalPrice,
-                    orderId: orderId,
-                    fallbackUrl: fallbackUrl
-                }),
-            });
-
-            if (!response.ok) {
-                Alert.alert('Error', 'Failed to initiate payment.');
-                console.error('Response not OK:', response.status);
-                return;
-            }
+            console.log(data);
             
-            const data = await response.json();
 
-            if (data.url){
-                Linking.openURL(data.url);
-                
+            if (data.orderId){
+                const state = await getPaymentStatus(data.orderId);
             }else{
-                Alert.alert('Error', 'There is no Vipps URL.');
+                Alert.alert('Error', 'There is no reference.');
             }
             
         } catch (error) {

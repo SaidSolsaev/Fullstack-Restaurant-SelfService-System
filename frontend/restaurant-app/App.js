@@ -76,8 +76,8 @@ export default function App() {
               elevation: 0,
               shadowOpacity: 0,
               borderBottomWidth: 0,
-              width: "70%",
             },
+            headerShadowVisible: false,
             headerLeft: () => <Header />,
             title: "",
           }}
@@ -102,7 +102,7 @@ export default function App() {
               <Stack.Screen 
                 name="Main" 
                 component={MainScreen} 
-                options={{ headerShown: true }} 
+                options={{ headerShown: true}} 
               />
               
               <Stack.Screen 

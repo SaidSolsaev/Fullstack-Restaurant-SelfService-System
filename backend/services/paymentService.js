@@ -39,31 +39,45 @@ export const initiatePayment = async(phoneNumber, amount, fallbackUrl, orderId) 
     const accessToken = await getAccessToken();
 
     const paymentData = {
-        customerInfo: {
-            mobileNumber: phoneNumber,
+        customer: {
+            phoneNumber: phoneNumber.replace("+", ""),
         },
-        merchantInfo: {
-            merchantSerialNumber: '344925',
-            callbackPrefix: `https://${process.env.NGROK_URL}/api/payment/callback`,
-            fallBack: fallbackUrl,
-            consentRemovalPrefix: `https://${process.env.NGROK_URL}/api/payment/remove-consent`,
-            paymentType: 'eComm Regular Payment',
+        reference: orderId,
+        paymentMethod: {
+            type: "WALLET"
         },
-        transaction: {
-            amount: amount * 100,
-            transactionText: 'Order payment for your purchase',
-            orderId: orderId,
+        amount: {
+            currency: "NOK",
+            value: amount * 100,
         },
+        userFlow: "PUSH_MESSAGE",
+        // merchantInfo: {
+        //     merchantSerialNumber: '344925',
+        //     callbackPrefix: `https://${process.env.NGROK_URL}/api/payment/callback`,
+        //     fallBack: fallbackUrl,
+        //     consentRemovalPrefix: `https://${process.env.NGROK_URL}/api/payment/remove-consent`,
+        //     paymentType: 'MOBILE',
+        // },
+        // transaction: {
+        //     amount: amount * 100,
+        //     transactionText: 'Order payment for your purchase',
+        //     orderId: orderId,
+        // },
     };
+
+
+    const idempotencyKey = `order-${orderId}-${Date.now()}`;
 
     try {
         const response = await axios.post(
-            `${BASE_URL}/ecomm/v2/payments`,
+            `${BASE_URL}/epayment/v1/payments`,
             paymentData,
             {
                 headers: {
                     'Authorization': `Bearer ${accessToken}`,
                     'Ocp-Apim-Subscription-Key': SUBSCRIPTION_KEY,
+                    'Idempotency-Key': idempotencyKey,
+                    'Merchant-Serial-Number': '344925',
                     'Content-Type': 'application/json',
                     'Vipps-System-Name': 'Burger Place',
                     'Vipps-System-Version': '1.0',
@@ -71,19 +85,66 @@ export const initiatePayment = async(phoneNumber, amount, fallbackUrl, orderId) 
             }
         );
 
-        
+       
+
         return {
             url: response.data.url,
             orderId: orderId
         };
     } catch (error) {
-        // console.error('Failed to initiate payment', error);
+        console.error(error.response?.data)
         throw new Error('Payment initiation failed');
     }
 }
 
-export const handlePaymentCallback = async (orderId, paymentDetails) => {
+export const pollPaymentStatus = async (orderId) => {
+    let pollAtempts = 0;
+    const accessToken = await getAccessToken();
 
+    const poll = async () => {
+        try {
+            const response = axios.get(
+                `${BASE_URL}/epayment/v1/payments/${orderId}`,
+                {
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`,
+                        'Ocp-Apim-Subscription-Key': SUBSCRIPTION_KEY,
+                        'Merchant-Serial-Number': '344925',
+                        'Content-Type': 'application/json'
+                    }
+                }
+            );
+
+            const status = response.data.state;
+            console.log(status);
+
+            if (status === 'AUTHORIZED'){
+                return {status: 'completed', orderId, message: "Payment Successful!"}
+            } else if(status === 'ABORTED' || status === 'TERMINATED'){
+                return {status: 'cancelled', orderId, message: "Payment Cancelled"}
+            } else if (status === "EXPIRED"){
+                return {status: "expired", orderId, message: "Payment expired"}
+            } else if (status === 'CREATED'){
+                if (pollAtempts < 5){
+                    pollAtempts++;
+                    await new Promise(resolve => setTimeout(resolve, 10000));
+                    return poll();
+                } else {
+                    return {status: "Timeout", orderId, message: "Payment Timed out. Please try again."}
+                }
+            } else{
+                return {status: "unkown", orderId, message: "Error occured, Unkonwn status"}
+            }
+        } catch (error) {
+            return {status: "error", orderId, message: "Error polling payment status"}
+        }
+    }
+
+    return poll();
+}
+
+export const handlePaymentCallback = async (orderId, paymentDetails) => {
+    console.log("inside handle payment callback")
     const latestTransaction = paymentDetails.transactionLogHistory[0];
 
     if (!latestTransaction) {

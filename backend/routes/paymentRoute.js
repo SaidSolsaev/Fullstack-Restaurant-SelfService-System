@@ -1,5 +1,5 @@
 import express from 'express';
-import { initiatePayment, handlePaymentCallback, getPaymentDetails } from '../services/paymentService.js';
+import { initiatePayment, handlePaymentCallback, getPaymentDetails, pollPaymentStatus } from '../services/paymentService.js';
 
 const router = express.Router();
 
@@ -46,5 +46,17 @@ router.post('/remove-consent', async (req, res) => {
 
     res.status(200).send('Consent removal handled');
 });
+
+
+router.get("/poll-status/:orderId", async (req, res, next) => {
+    const {orderId} = req.params;
+
+    try {
+        const paymentState = await pollPaymentStatus(orderId);
+        res.status(200).json(paymentState)
+    } catch (error) {
+        next(error);
+    }
+})
 
 export default router;
