@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState, useRef } from 'react';
-import { View, Text, StyleSheet, Alert, Platform, ActivityIndicator, } from 'react-native';
+import { View, Text, StyleSheet, Alert, Platform, ActivityIndicator, Pressable, Image, } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { CartContext } from '../context/CartContext';
 import { pollPaymentStatus } from '../services/api/paymentApi';
@@ -55,14 +55,38 @@ const PaymentProcessingScreen = ({ route }) => {
 
     return (
         <View style={styles.container}>
-            {isLoading ? (
-                <>
-                    <ActivityIndicator size="large" color="#FF6347" />
-                    <Text style={styles.loadingText}>Confirming your payment...</Text>
-                </>
-            ) : (
-                <Text>Payment processing complete</Text>
-            )}
+            <View style={styles.leftSide}>
+                <View style={styles.textContainer}>
+                    
+                    <View style={styles.amountBox}>
+                        <Text style={{fontSize: 18, fontWeight: "600", marginRight: 15}}>Total</Text>
+                        <Text style={styles.price}>${totalPrice}</Text>
+                    </View>
+                    
+                    
+                    <Text>
+                        Follow the instructions on your phone.
+                    </Text>
+
+                    {isLoading && 
+                        <ActivityIndicator size="small" color="#FF6347" />
+                    }
+
+                    <Pressable style={styles.button}>
+                        <Text>Go back</Text>
+                    </Pressable>
+
+                </View>
+
+                <View style={styles.bottomContainer}>
+                    <Text>Payment Method</Text>
+                </View>
+                
+            </View>
+
+            <View style={styles.rightSide}>
+                <Image style={styles.image} source={require("../assets/phone_push_warning.png")}/>
+            </View>
         </View>
     );
 };
@@ -73,12 +97,44 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: '#FFEBCD',
+        flexDirection: "row",
     },
     loadingText: {
         marginTop: 20,
         fontSize: 18,
         color: '#333',
     },
+    leftSide: {
+        alignItems: "center",
+        justifyContent: "space-between",
+        flexDirection: "column",
+        padding: 45,
+        width: "50%"
+    },
+    textContainer: {
+        alignItems: "center",
+    },
+    amountBox: {
+        flexDirection: "row",
+        margin: 20,
+        alignItems: "center",
+        textAlign: "center"
+    },
+    price: {
+
+    },
+    rightSide: {
+        padding: 45,
+        alignItems: "center",
+        justifyContent: "center",
+        width: "50%"
+    },
+    image: {
+        width: 300,
+        height: 300
+    },
+    bottomContainer: {
+    }
 });
 
 export default PaymentProcessingScreen;
