@@ -127,9 +127,10 @@ const styles = StyleSheet.create({
     tableRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        paddingVertical: 10,
+        paddingVertical: 20,
         borderBottomWidth: 1,
         borderBottomColor: '#f0f0f0',
+        alignItems: "center"
     },
     itemText: {
         flex: 1,

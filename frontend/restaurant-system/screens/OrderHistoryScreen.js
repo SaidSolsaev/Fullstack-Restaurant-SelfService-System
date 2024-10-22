@@ -20,7 +20,7 @@ const OrderHistoryScreen = () => {
     const [dateRange, setDateRange] = useState({startDate: null, endDate: null});
     const [isDatePickerVisible, setIsDatePickerVisible] = useState(false);
     const [datesReset, setDatesReset] = useState(false);
-
+    console.log(orders);
     const navigation = useNavigation();
 
     useEffect(() => {

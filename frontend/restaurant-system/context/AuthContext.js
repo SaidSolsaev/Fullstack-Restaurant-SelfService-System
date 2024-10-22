@@ -11,33 +11,33 @@ export const AuthProvider = ({children}) => {
     const [error, setError] = useState(null);
     const [restaurant, setRestaurant] = useState(null);
 
-    const saveToken = async (token) => {
+    const saveToken = async (key, token) => {
         if (Platform.OS === 'web') {
-            localStorage.setItem('access_token', token);
+            localStorage.setItem(key, token);
         } else {
-            await SecureStore.setItemAsync('access_token', token);
+            await SecureStore.setItemAsync(key, token);
         }
     };
 
-    const getToken = async () => {
+    const getToken = async (key) => {
         if (Platform.OS === 'web') {
-            return localStorage.getItem('access_token');
+            return localStorage.getItem(key);
         } else {
-            return await SecureStore.getItemAsync('access_token');
+            return await SecureStore.getItemAsync(key);
         }
     };
 
-    const removeToken = async () => {
+    const removeToken = async (key) => {
         if (Platform.OS === 'web') {
-            localStorage.removeItem('access_token');
+            localStorage.removeItem(key);
         } else {
-            await SecureStore.deleteItemAsync('access_token');
+            await SecureStore.deleteItemAsync(key);
         }
     };
 
     useEffect(() => {
         const checkLoginStatus = async () => {
-            const token = await getToken();
+            const token = await getToken('access_token');
 
             if (token) {
                 setIsLoggedIn(true);
@@ -47,29 +47,39 @@ export const AuthProvider = ({children}) => {
             }
             setIsLoading(false);
         }
+
+        const getRestaurantInfo = async() => {
+            const savedRestaurant = await getToken("restaurant");
+
+            if (savedRestaurant){
+                setRestaurant(JSON.parse(savedRestaurant));
+            }
+        }
+
         checkLoginStatus();
+        getRestaurantInfo();
     }, []);
 
     const login = async (email, password) => {
         const result = await handleLogin(email, password);
         
         if (result && result.access_token) {
-            await saveToken(result.access_token);
+            await saveToken("access_token", result.access_token);
+            console.log("Login res", result.restaurant)
+            await saveToken("restaurant", JSON.stringify(result.restaurant));
             setIsLoggedIn(true);
-            setRestaurant(result.restaurant);
             setError(null);
             navigation.replace('MainScreen')
-        }else if(result && result.error){
+        } else if(result && result.error){
             setError(result.error)
         }
     }
 
     const logout = async () => {
         await handleLogout();
-        await removeToken();
+        await removeToken("access_token");
+        await removeToken("restaurant");
         setIsLoggedIn(false);
-        setRestaurant(null);
-        
     };
 
     return (

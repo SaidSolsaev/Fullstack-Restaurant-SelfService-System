@@ -24,6 +24,7 @@ export const handleLogin = async (email, password) => {
                     'Authorization': `Bearer ${token}`
                 }
             });
+            console.log(restaurantResponse.data)
 
             return {
                 access_token: token,
