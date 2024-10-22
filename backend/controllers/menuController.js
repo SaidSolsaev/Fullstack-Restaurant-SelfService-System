@@ -2,7 +2,7 @@ import Menu from '../models/menu.js';
 import Restaurant from '../models/restaurant.js';
 
 export const getAllMenus = async (req, res, next) => {
-    const restaurantId = req.user.restaurantId;
+    const restaurantId = req.user.restaurantId || req.headers['restaurant-id'];
 
     try {
         const menus = await Menu.findAll({where: {restaurantId}});
@@ -14,7 +14,7 @@ export const getAllMenus = async (req, res, next) => {
 
 export const getMenuById = async (req, res, next) => {
     const { id } = req.params;
-    const restaurantId = req.user.restaurantId;
+    const restaurantId = req.user.restaurantId || req.headers['restaurant-id'];
 
     try {
         const menu = await Menu.findOne({where: {id, restaurantId}});
@@ -29,7 +29,7 @@ export const getMenuById = async (req, res, next) => {
 
 
 export const createMenu = async (req, res, next) => {
-    const restaurantId = req.user.restaurantId;
+    const restaurantId = req.user.restaurantId || req.headers['restaurant-id'];
 
     try {
         const restaurant = await Restaurant.findByPk(restaurantId);
@@ -50,7 +50,7 @@ export const createMenu = async (req, res, next) => {
 
 export const deleteMenu = async(req, res, next) => {
     const { id } = req.params;
-    const restaurantId = req.user.restaurantId;
+    const restaurantId = req.user.restaurantId || req.headers['restaurant-id'];
     
     try {
         const menu = Menu.findOne({where: {restaurantId, id}})

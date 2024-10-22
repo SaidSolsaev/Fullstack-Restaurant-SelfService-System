@@ -1,5 +1,10 @@
 import Constants from "expo-constants";
+import { Platform } from "react-native";
 
+const URL = Platform.OS === 'web' 
+    ? 'http://localhost:3000'
+    : Constants.expoConfig?.extra?.NGROK_URL
+;
 
 export const initiateVippsPayment = async (phoneNumber, totalPrice, orderId) => {
     
@@ -24,7 +29,7 @@ export const initiateVippsPayment = async (phoneNumber, totalPrice, orderId) => 
 }
 
 export const pollPaymentStatus = async (orderId) => {
-    const response = await fetch(`${Constants.expoConfig?.extra?.NGROK_URL}/api/payment/poll-status/${orderId}`);
+    const response = await fetch(`${URL}/api/payment/poll-status/${orderId}`);
     
     return await response.json();
 };

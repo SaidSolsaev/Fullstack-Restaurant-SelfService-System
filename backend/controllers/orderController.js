@@ -5,7 +5,7 @@ import { generateOrderItemNumber, generateOrderNumber } from '../utils/helpers.j
 import sequelize from '../config/db.js';
 
 export const getAllOrders = async (req, res, next) => {
-    const restaurantId = req.user.restaurantId;
+    const restaurantId = req.user.restaurantId || req.headers['restaurant-id'];
 
     try {
         const orders = await Order.findAll({
@@ -33,7 +33,7 @@ export const getAllOrders = async (req, res, next) => {
 
 export const getOrderByOrderNumber = async (req, res, next) => {
     const { orderNumber } = req.params;
-    const restaurantId = req.user.restaurantId;
+    const restaurantId = req.user.restaurantId || req.headers['restaurant-id'];
 
     try {
         const order = await Order.findOne({
@@ -79,7 +79,7 @@ export const getOrderByOrderNumber = async (req, res, next) => {
 }
 
 export const getOrderById = async (req, res, next) => {
-    const restaurantId = req.user.restaurantId;
+    const restaurantId = req.user.restaurantId || req.headers['restaurant-id'];
     const {id} = req.params;
 
     try {
@@ -112,7 +112,7 @@ export const getOrderById = async (req, res, next) => {
 
 export const createOrder = async (req, res, next) => {
     const { items, phoneNumber, totalAmount } = req.body;
-    const restaurantId = req.user.restaurantId;
+    const restaurantId = req.user.restaurantId || req.headers['restaurant-id'];
     
     const transaction = await sequelize.transaction();
 
@@ -156,7 +156,7 @@ export const createOrder = async (req, res, next) => {
 export const updateOrder = async (req, res, next) => {
     const { id } = req.params;
     const { status, estimatedTime } = req.body;
-    const restaurantId = req.user.restaurantId;
+    const restaurantId = req.user.restaurantId || req.headers['restaurant-id'];
     
     try {
         const order = await Order.findOne({where: {id, restaurantId} });
@@ -177,7 +177,7 @@ export const updateOrder = async (req, res, next) => {
 
 export const deleteOrder = async (req, res, next) => {
     const { id } = req.params;
-    const restaurantId = req.user.restaurantId;
+    const restaurantId = req.user.restaurantId || req.headers['restaurant-id'];
     
     try {
         const order = await Order.findOne({where: {id, restaurantId}});

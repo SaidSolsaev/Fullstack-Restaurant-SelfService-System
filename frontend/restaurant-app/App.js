@@ -15,6 +15,7 @@ import { StatusBar } from 'react-native';
 import Header from './components/Header';
 import DeviceLogin from './screens/DeviceLogin';
 import * as SecureStore from 'expo-secure-store';
+import { getToken } from './services/api/getRestaurantInfo';
 
 
 const Stack = createNativeStackNavigator();
@@ -40,7 +41,7 @@ export default function App() {
 
   useEffect(() => {
     const checkAutentication = async () => {
-      const token = await SecureStore.getItemAsync('deviceToken');
+      const token = await getToken('deviceToken');
 
 
       if (token ){

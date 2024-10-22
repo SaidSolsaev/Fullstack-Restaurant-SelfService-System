@@ -10,7 +10,7 @@ const __dirname = path.dirname(__filename);
 
 
 export const getAllMenuItems = async(req, res, next) => {
-    const restaurantId = req.user.restaurantId;
+    const restaurantId = req.user.restaurantId || req.headers['restaurant-id'];
 
     try {
         const { category } = req.query;
@@ -38,7 +38,7 @@ export const getAllMenuItems = async(req, res, next) => {
 
 export const getMenuItemById = async (req, res, next) => {
     const { id } = req.params;
-    const restaurantId = req.user.restaurantId;
+    const restaurantId = req.user.restaurantId || req.headers['restaurant-id'];
 
     try {
         const menuItem = await MenuItem.findOne({where: {id, restaurantId}});
@@ -53,7 +53,7 @@ export const getMenuItemById = async (req, res, next) => {
 
 export const createMenuItem = async (req, res, next) => {
     const { name, description, price, menuId, categoryId, discount } = req.body;
-    const restaurantId = req.user.restaurantId;
+    const restaurantId = req.user.restaurantId || req.headers['restaurant-id'];
 
 
     try {
@@ -90,7 +90,7 @@ export const createMenuItem = async (req, res, next) => {
 export const updateMenuItem = async (req, res, next) => {
     const { id } = req.params; 
     const { name, description, price, categoryId, discount } = req.body;
-    const restaurantId = req.user.restaurantId;
+    const restaurantId = req.user.restaurantId || req.headers['restaurant-id'];
     
     try {
         const menuItem = await MenuItem.findOne({where: {id, restaurantId}});
@@ -139,7 +139,7 @@ export const updateMenuItem = async (req, res, next) => {
 
 export const deleteMenuItem = async (req, res, next) => {
     const { id } = req.params; 
-    const restaurantId = req.user.restaurantId;
+    const restaurantId = req.user.restaurantId || req.headers['restaurant-id'];
     
     try {
         const menuItem = await MenuItem.findOne({where: {id, restaurantId}});

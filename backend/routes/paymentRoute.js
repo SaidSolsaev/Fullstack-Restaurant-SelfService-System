@@ -48,15 +48,16 @@ router.post('/remove-consent', async (req, res) => {
 });
 
 
-router.get("/poll-status/:orderId", async (req, res, next) => {
+router.get("/poll-status/:orderId", async (req, res) => {
     const {orderId} = req.params;
 
     try {
         const paymentState = await pollPaymentStatus(orderId);
-        console.log(paymentState)
+        
         res.status(200).json(paymentState)
     } catch (error) {
-        next(error);
+        console.error("Error polling payment status:", error);
+        res.status(500).json({ status: 'error', message: 'Failed to poll payment status' });
     }
 })
 

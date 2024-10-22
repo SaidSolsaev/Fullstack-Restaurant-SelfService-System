@@ -2,7 +2,7 @@ import Category from '../models/category.js';
 
 export const getCategoryById = async (req, res, next) => {
     const { id } = req.params;
-    const restaurantId = req.user.restaurantId;
+    const restaurantId = req.user.restaurantId || req.headers['restaurant-id'];
 
     try {
         const category = await Category.findOne({where: {id, restaurantId}});
@@ -18,7 +18,7 @@ export const getCategoryById = async (req, res, next) => {
 };
 
 export const getAllCategories = async (req, res, next) => {
-    const restaurantId = 1;
+    const restaurantId = req.user.restaurantId || req.headers['restaurant-id'];
 
     try {
         const categories = await Category.findAll({where: {restaurantId}});
@@ -30,7 +30,8 @@ export const getAllCategories = async (req, res, next) => {
 
 export const createCategory = async (req, res, next) => {
     const { name } = req.body;
-    const restaurantId = req.user.restaurantId;
+    const restaurantId = req.user.restaurantId || req.headers['restaurant-id'];
+
     
     try {
         const newCategory = await Category.create({ name: name, restaurantId: restaurantId });
@@ -42,7 +43,7 @@ export const createCategory = async (req, res, next) => {
 
 export const deleteCategory = async (req, res, next) => {
     const { id } = req.params;
-    const restaurantId = req.user.restaurantId;
+    const restaurantId = req.user.restaurantId || req.headers['restaurant-id'];
 
     try {
         const category = await Category.findOne({where: {id, restaurantId}});
@@ -60,7 +61,7 @@ export const deleteCategory = async (req, res, next) => {
 export const updateCategory = async (req, res, next) => {
     const { id } = req.params;
     const { name } = req.body;
-    const restaurantId = req.user.restaurantId;
+    const restaurantId = req.user.restaurantId || req.headers['restaurant-id'];
 
     try {
         const category = await Category.findOne({where: {id, restaurantId}});

@@ -1,21 +1,66 @@
 import { Platform } from "react-native";
 import * as SecureStore from 'expo-secure-store';
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { jwtDecode } from "jwt-decode";
+
 
 const URL = Platform.OS === 'web' 
     ? 'http://localhost:3000'
     : 'https://miserably-clever-toucan.ngrok-free.app'
 ;
 
+const getRestaurantIdFromToken = async () => {
+    try {
+        const token = await getToken('deviceToken');
+
+        if (token){
+            const decodedToken = jwtDecode(token);
+            const restaurantId = decodedToken.restaurantId;
+            return restaurantId
+        } else {
+            console.error("No token found");
+            return null;
+        }
+    } catch (error) {
+        console.error("Error decoding token: ", error)
+        return null;
+    }
+};
+
+export const saveToken = async (key, value) => {
+    if (Platform.OS === 'web'){
+        localStorage.setItem(key, value);
+    } else {
+        await SecureStore.setItemAsync(key, value)
+    }
+};
+
+export const getToken = async (key) => {
+    if (Platform.OS === 'web') {
+        return localStorage.getItem(key);
+    } else {
+        return await SecureStore.getItemAsync(key);
+    }
+};
+
+export const deleteToken = async (key) => {
+    if (Platform.OS === 'web') {
+        localStorage.removeItem(key);
+    } else {
+        await SecureStore.deleteItemAsync(key);
+    }
+};
 
 export const getRestaurantInfo = async () => {
     try {
-        const token = await SecureStore.getItemAsync('deviceToken'); 
+        const restaurantId = await getRestaurantIdFromToken();
+        const token = await getToken('deviceToken');
+
         const response = await fetch(`${URL}/api/restaurants`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json',
+                'restaurant-id': restaurantId,
             }
         });
         const json = await response.json();
@@ -48,7 +93,7 @@ export const deviceLogin = async (deviceName, deviceKey) => {
 
         const data = await response.json();
 
-        await SecureStore.setItemAsync('deviceToken', data.token);
+        await saveToken('deviceToken', data.token);
 
         return { success: true, token: data.token };
     } catch (error) {
@@ -59,12 +104,14 @@ export const deviceLogin = async (deviceName, deviceKey) => {
 
 export const getMenuItems = async () => {
     try {
-        const token = await SecureStore.getItemAsync('deviceToken');
+        const restaurantId = await getRestaurantIdFromToken();
+        const token = await getToken('deviceToken');
 
         const response = await fetch(`${URL}/api/menu-items`, {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`,
+                'restaurant-id': restaurantId
             },
         });
 
@@ -84,10 +131,13 @@ export const getMenuItems = async () => {
 
 export const getCategories = async () => {
     try {
-        const token = await SecureStore.getItemAsync('deviceToken');
+        const restaurantId = await getRestaurantIdFromToken();
+        const token = await getToken('deviceToken');
+
         const response = await fetch(`${URL}/api/categories`, {
             headers: {
                 'Authorization': `Bearer ${token}`,
+                'restaurant-id': restaurantId
             }
         });
         const json = await response.json();
@@ -107,14 +157,16 @@ export const createOrderBackendCall = async (cartItems, phoneNumber, totalPrice)
             addOns: item.addOns
         }));
 
-        const token = await SecureStore.getItemAsync('deviceToken');
+        const restaurantId = await getRestaurantIdFromToken();
+        const token = await getToken('deviceToken');
 
 
         const response = await fetch(`${URL}/api/orders`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
+                'Authorization': `Bearer ${token}`,
+                'restaurant-id': restaurantId
             },
             body: JSON.stringify({
                 items: formattedItems,
