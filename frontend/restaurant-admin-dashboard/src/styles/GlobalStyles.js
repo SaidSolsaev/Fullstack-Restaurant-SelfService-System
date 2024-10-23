@@ -159,26 +159,26 @@ export const GlobalStyles = createGlobalStyle`
     }
 
     h1 {
-        font-size: 2.5rem;
-
-        @media (max-width: 768px) {
-            font-size: 2rem;
-        }
-
-        @media (max-width: 480px) {
-            font-size: 1.5rem;
-        }
-    }
-
-    h2 {
         font-size: 2rem;
 
         @media (max-width: 768px) {
-            font-size: 1.75rem;
+            font-size: 1.5rem;
         }
 
         @media (max-width: 480px) {
             font-size: 1.25rem;
+        }
+    }
+
+    h2 {
+        font-size: 1.75rem;
+
+        @media (max-width: 768px) {
+            font-size: 1.25rem;
+        }
+
+        @media (max-width: 480px) {
+            font-size: 1rem;
         }
     }
 

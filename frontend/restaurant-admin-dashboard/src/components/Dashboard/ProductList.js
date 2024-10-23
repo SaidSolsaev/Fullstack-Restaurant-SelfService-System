@@ -1,144 +1,107 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 
 
 const ProductListWrapper = styled.div`
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    width: 100%;
+
+    @media (max-width: 1200px) {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (max-width: 768px) {
+        grid-template-columns: 1fr;
+    }
+`;
+
+
+const ProductCard = styled.div`
+    background-color: ${({ theme }) => theme.cardBackground};
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: ${({ theme }) => theme.boxShadow};
     display: flex;
     flex-direction: column;
-    width: 48%;
-    padding: 20px;
-    max-width: 500px;
-    gap: 20px;
-    flex-wrap: wrap;
-    background-color: ${({ theme }) => theme.cardBackground};
-    box-shadow: ${({ theme }) => theme.boxShadow};
-    margin: 20px 0;
 
-    @media (max-width: 768px) {
-        flex-direction: column;
+    h3 {
+        margin-bottom: 10px;
+        font-size: 1.2rem;
+        text-align: center;
     }
-`;
-
-const CategoryList = styled.ul`
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 20px;
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-
-    li {
-        cursor: pointer;
-        padding: 10px;
-        margin-bottom: 5px;
-        border-radius: 5px;
-        
-        transition: background-color 0.3s ease;
-
-        &:hover {
-            background-color: ${({ theme }) => theme.primaryButtonHover};
-        }
-    }
-
-    @media (max-width: 768px) {
-        width: 100%;
-    }
-`;
-
-const ProductList = styled.div`
-    border-radius: 10px;
-    max-width: 100%;
-
 
     ul {
         list-style-type: none;
         padding: 0;
+        margin: 0;
 
         li {
             padding: 10px;
-            border-radius: 5px;
-            margin-bottom: 10px;
-        }
-
-        @media (max-width: 768px) {
-            li {
-                padding: 8px;
-            }
+            font-size: 1rem;
         }
     }
 `;
 
 const TopSellingProducts = () => {
     const { orders } = useSelector((state) => state.orders);
-    const [selectedCategory, setSelectedCategory] = useState(null);
 
     
-    const { categories, topProductsByCategory } = useMemo(() => {
+    const topCategories = useMemo(() => {
         const categorySales = {};
-        const categoriesSet = new Set();
+
         orders.forEach((order) => {
             if (['approved', 'delivered'].includes(order.status)) {
                 order.orderItems.forEach((item) => {
                     const productName = item.MenuItem.name;
                     const category = item.MenuItem.Category.name;
 
-                    categoriesSet.add(category);
-
                     if (!categorySales[category]) {
-                        categorySales[category] = {};
+                        categorySales[category] = { total: 0, products: {} };
                     }
 
-                    if (categorySales[category][productName]) {
-                        categorySales[category][productName] += item.quantity;
+                    categorySales[category].total += item.quantity;
+
+                    if (categorySales[category].products[productName]) {
+                        categorySales[category].products[productName] += item.quantity;
                     } else {
-                        categorySales[category][productName] = item.quantity;
+                        categorySales[category].products[productName] = item.quantity;
                     }
                 });
             }
         });
 
-        
-        Object.keys(categorySales).forEach((category) => {
-            categorySales[category] = Object.entries(categorySales[category])
-                .sort((a, b) => b[1] - a[1]) 
-                .slice(0, 3);
-        });
+       
+        const filteredCategories = Object.keys(categorySales)
+            .filter((category) => categorySales[category].total >= 5)
+            .slice(0, 4)
+            .map((category) => {
+                const topProducts = Object.entries(categorySales[category].products)
+                    .sort((a, b) => b[1] - a[1])
+                    .slice(0, 3);
 
-        return {
-            categories: Array.from(categoriesSet),
-            topProductsByCategory: categorySales,
-        };
+                return { category, topProducts };
+            });
+
+        return filteredCategories;
     }, [orders]);
 
     return (
         <ProductListWrapper>
-            <h2>Top 3 Products in {selectedCategory || 'Select a Category'}</h2>
-
-            {/* Category List */}
-            <CategoryList>
-                {categories.map((category, index) => (
-                    <li key={index} onClick={() => setSelectedCategory(category)}>
-                        {category}
-                    </li>
-                ))}
-            </CategoryList>
-
-            {/* Product List for the selected category */}
-            <ProductList>
-                {selectedCategory && topProductsByCategory[selectedCategory] ? (
+            {topCategories.map(({ category, topProducts }) => (
+                <ProductCard key={category}>
+                    <h3>Top 3 Products in {category}</h3>
                     <ul>
-                        {topProductsByCategory[selectedCategory].map(([productName, quantity], index) => (
+                        {topProducts.map(([productName, quantity], index) => (
                             <li key={index}>
                                 <strong>{productName}</strong>: {quantity} sold
                             </li>
                         ))}
                     </ul>
-                ) : (
-                    <p>Please select a category to see the top products.</p>
-                )}
-            </ProductList>
+                </ProductCard>
+            ))}
         </ProductListWrapper>
     );
 };

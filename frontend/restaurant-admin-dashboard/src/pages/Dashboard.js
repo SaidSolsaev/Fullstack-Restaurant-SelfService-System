@@ -5,6 +5,46 @@ import styled from 'styled-components';
 import OrderSummary from '../components/Dashboard/OrderSummary';
 import MonthlyRevenueChart from '../components/Dashboard/MonthlyRevenueChart';
 import TopSellingProducts from '../components/Dashboard/ProductList';
+import MonthlyOrdersChart from '../components/Dashboard/MonthlyOrdersChart';
+
+const DashboardContainer = styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+`;
+
+const DashboardCard = styled.div`
+    background-color: ${({ theme }) => theme.cardBackground};
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: ${({ theme }) => theme.boxShadow};
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+`;
+
+const DashboardRow = styled.div`
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 20px;
+`;
+
+const DasboardGrid = styled.div`
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    width: 100%;
+
+    @media (max-width: 1200px) {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (max-width: 768px) {
+        grid-template-columns: 1fr;
+    }
+`;
+
 
 const Dashboard = () => {
     const dispatch = useDispatch();
@@ -15,6 +55,7 @@ const Dashboard = () => {
         
     }, [dispatch]);
 
+    console.log(restaurantData);
 
     if (restaurantLoading) return <p>Loading...</p>;
     if (restaurantError) return <p>Error: {restaurantError}</p>;
@@ -22,15 +63,31 @@ const Dashboard = () => {
 
 
     return (
-        <div>
-            <h1>Dashboard for {restaurantData?.name}</h1>
+        <DashboardContainer>
+            <DashboardCard>
+                <OrderSummary />
+            </DashboardCard>
 
-            <OrderSummary />
+            <DashboardRow>
+                <TopSellingProducts />
+            </DashboardRow>
+
             
-            <MonthlyRevenueChart />
+            <DasboardGrid>
+                <DashboardCard>
+                    <MonthlyRevenueChart />
+                </DashboardCard>
 
-            <TopSellingProducts />
-        </div>
+                <DashboardCard>
+                    <MonthlyOrdersChart />
+                </DashboardCard>
+            </DasboardGrid>
+
+            
+            
+           
+           
+        </DashboardContainer>
     )
 }
 
