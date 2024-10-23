@@ -3,6 +3,7 @@ import MenuItem from '../models/menuItem.js';
 import { OrderItems } from '../models/order.js';
 import { generateOrderItemNumber, generateOrderNumber } from '../utils/helpers.js';
 import sequelize from '../config/db.js';
+import Category from '../models/category.js';
 
 export const getAllOrders = async (req, res, next) => {
     const restaurantId = req.user.restaurantId || req.headers['restaurant-id'];
@@ -16,7 +17,13 @@ export const getAllOrders = async (req, res, next) => {
                     include: [
                         {
                             model: MenuItem,
-                            attributes: ['id', 'name', 'price', 'image_url'],
+                            include: [
+                                {
+                                    model: Category,
+                                    attributes: ['id' , 'name']
+                                }
+                            ],
+                            attributes: ['id', 'name', 'price', 'image_url', ],
                         },
                     ],
                     attributes: ['quantity', 'addOns'],

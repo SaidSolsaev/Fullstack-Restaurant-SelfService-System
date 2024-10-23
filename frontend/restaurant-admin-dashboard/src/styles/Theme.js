@@ -8,10 +8,12 @@ export const lightTheme = {
   // Text
   text: '#333333',
   secondaryText: '#555555',
-
+  textHover: '#4A90E2',
+  
   // Buttons
   primaryButton: '#4CAF50',
   primaryButtonText: '#ffffff',
+  primaryButtonHover: '#45A049',
   secondaryButton: '#f0f0f0', 
   secondaryButtonText: '#333333',
 
@@ -39,10 +41,12 @@ export const darkTheme = {
   // Text
   text: '#fafafa',
   secondaryText: '#bfbfbf',   
+  textHover: '#FFB74D',
 
   // Buttons
   primaryButton: '#4CAF50',
   primaryButtonText: '#ffffff', 
+  primaryButtonHover: '#45A049',
   secondaryButton: '#444455',   
   secondaryButtonText: '#fafafa', 
 
