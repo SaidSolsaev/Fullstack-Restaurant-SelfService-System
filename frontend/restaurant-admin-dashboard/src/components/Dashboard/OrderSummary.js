@@ -3,6 +3,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchOrders } from '../../redux/slices/orderSlice'
 import styled from 'styled-components';
 import { FaMoneyBillAlt } from "react-icons/fa";
+import { AiOutlineShoppingCart } from 'react-icons/ai';
+import { FaListAlt, FaDollarSign, FaTruck } from 'react-icons/fa';
+import { MdCancel } from 'react-icons/md';
+import { AiOutlineClockCircle } from 'react-icons/ai';
 
 
 
@@ -17,7 +21,7 @@ const InfoContainer = styled.div`
 
 
 const InfoCard = styled.div`
-    background-color: ${({ bgColor }) => bgColor || '#FFF'};
+    background-color: ${({ $bgColor }) => $bgColor || '#FFF'};
     padding: 20px;
     border-radius: 12px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -98,7 +102,7 @@ const Icon = styled.div`
 `;
 
 const IconWrapper = styled.div`
-    background-color: ${({ iconBgColor }) => iconBgColor || '#FFF'};
+    background-color: ${({ $iconBgColor }) => $iconBgColor || '#FFF'};
     padding: 10px;
     border-radius: 50%;
     display: inline-block;
@@ -140,9 +144,9 @@ const OrderSummary = () => {
             <small>Sales Summary</small>
 
             <OverviewContainer>
-                <InfoCard bgColor="#fce8e8">
-                    <IconWrapper iconBgColor="#ff9999">
-                        <Icon><FaMoneyBillAlt /></Icon>
+                <InfoCard $bgColor="#fce8e8">
+                    <IconWrapper $iconBgColor="#ff9999">
+                        <Icon><AiOutlineShoppingCart /></Icon>
                     </IconWrapper>
 
                     <h2>Total Orders</h2>
@@ -150,9 +154,9 @@ const OrderSummary = () => {
                     <small>+5% from yesterday</small>
                 </InfoCard>
 
-                <InfoCard bgColor="#fff5d9">
-                    <IconWrapper iconBgColor="#ffcc80">
-                        <Icon><FaMoneyBillAlt /></Icon>
+                <InfoCard $bgColor="#fff5d9">
+                    <IconWrapper $iconBgColor="#ffcc80">
+                        <Icon><FaListAlt /></Icon>
 
                     </IconWrapper>
                     <h2>Items Ordered</h2>
@@ -160,9 +164,9 @@ const OrderSummary = () => {
                     <small>+8% from yesterday</small>
                 </InfoCard>
 
-                <InfoCard bgColor="#e8f5e9">
-                    <IconWrapper iconBgColor="#81c784">
-                        <Icon><FaMoneyBillAlt /></Icon>
+                <InfoCard $bgColor="#e8f5e9">
+                    <IconWrapper $iconBgColor="#81c784">
+                        <Icon><FaDollarSign /></Icon>
                     </IconWrapper>
 
                     <h2>Today's Revenue</h2>
@@ -170,9 +174,9 @@ const OrderSummary = () => {
                     <small>+12% from yesterday</small>
                 </InfoCard>
 
-                <InfoCard bgColor="#e0f7fa">
-                    <IconWrapper iconBgColor="#4dd0e1">
-                        <Icon><FaMoneyBillAlt /></Icon>
+                <InfoCard $bgColor="#e0f7fa">
+                    <IconWrapper $iconBgColor="#4dd0e1">
+                        <Icon><MdCancel /></Icon>
                     </IconWrapper>
 
                     <h2>Canceled Orders</h2>
@@ -180,9 +184,9 @@ const OrderSummary = () => {
                     <small>-2% from yesterday</small>
                 </InfoCard>
 
-                <InfoCard bgColor="#f3e5f5">
-                    <IconWrapper iconBgColor="#ba68c8">
-                        <Icon><FaMoneyBillAlt /></Icon>
+                <InfoCard $bgColor="#f3e5f5">
+                    <IconWrapper $iconBgColor="#ba68c8">
+                        <Icon><AiOutlineClockCircle /></Icon>
                     </IconWrapper>
 
                     <h2>Pending Orders</h2>
@@ -190,9 +194,9 @@ const OrderSummary = () => {
                     <small>+1% from yesterday</small>
                 </InfoCard>
 
-                <InfoCard bgColor="#e1f5fe">
-                    <IconWrapper iconBgColor="#29b6f6">
-                        <Icon><FaMoneyBillAlt /></Icon>
+                <InfoCard $bgColor="#e1f5fe">
+                    <IconWrapper $iconBgColor="#29b6f6">
+                        <Icon><FaTruck /></Icon>
                     </IconWrapper>
 
                     <h2>Delivered Orders</h2>

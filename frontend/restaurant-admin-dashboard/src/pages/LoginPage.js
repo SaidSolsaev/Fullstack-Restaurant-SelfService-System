@@ -22,7 +22,6 @@ const LoginPage = () => {
         if (isAuthenticated) {
             navigate('/')
         }
-        console.log(isAuthenticated)
     }, [isAuthenticated, navigate])
 
     

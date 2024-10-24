@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useMemo} from 'react'
 import { useSelector } from 'react-redux';
 import { Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
@@ -7,25 +7,12 @@ import styled from 'styled-components';
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 
-const ChartRow = styled.div`
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    width: 100%;
-    align-items: center;
-
-    @media (max-width: 768px) {
-        flex-direction: column;
-    }
-`;
 
 const ChartWrapper = styled.div`
     border-radius: 10px;
-
-    canvas{
-        width: 100%;
-        height: 500px;
-    }
+    width: 100%;
+    height: 400px;
+    padding: 10px;
 `;
 
 const MonthlyRevenueChart = () => {
@@ -67,11 +54,12 @@ const MonthlyRevenueChart = () => {
             }
         ]
     };
-
+    
     
 
     const chartOptions = {
         responsive: true,
+        maintainAspectRatio: false,
         plugins: {
             legend: {
                 position: 'top',
@@ -87,21 +75,18 @@ const MonthlyRevenueChart = () => {
             },
         },
     };
-
     
     
     
     return (
-      
-        <ChartRow>
-            <ChartWrapper>
-                <Bar 
-                    data={revenueChartData} 
-                    options={chartOptions}
-                />
-            </ChartWrapper>
+        <ChartWrapper>
+            <Bar 
+                data={revenueChartData} 
+                options={chartOptions}
+            />
+        </ChartWrapper>
 
-        </ChartRow>
+    
        
     )
 }

@@ -6,6 +6,8 @@ import OrderSummary from '../components/Dashboard/OrderSummary';
 import MonthlyRevenueChart from '../components/Dashboard/MonthlyRevenueChart';
 import TopSellingProducts from '../components/Dashboard/ProductList';
 import MonthlyOrdersChart from '../components/Dashboard/MonthlyOrdersChart';
+import Last10Orders from '../components/Dashboard/Last10Orders';
+import OrderStats from '../components/Dashboard/OrderStats';
 
 const DashboardContainer = styled.div`
     display: flex;
@@ -55,9 +57,8 @@ const Dashboard = () => {
         
     }, [dispatch]);
 
-    console.log(restaurantData);
 
-    if (restaurantLoading) return <p>Loading...</p>;
+    if (restaurantLoading || !restaurantData) return <p>Loading...</p>;
     if (restaurantError) return <p>Error: {restaurantError}</p>;
     
 
@@ -83,9 +84,13 @@ const Dashboard = () => {
                 </DashboardCard>
             </DasboardGrid>
 
-            
-            
-           
+            <DasboardGrid>
+                <Last10Orders />
+            </DasboardGrid>
+
+            <DashboardCard>
+                <OrderStats />
+            </DashboardCard>
            
         </DashboardContainer>
     )

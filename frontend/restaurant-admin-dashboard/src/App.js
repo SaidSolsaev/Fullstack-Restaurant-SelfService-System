@@ -17,12 +17,12 @@ import Categories from "./pages/Categories"
 
 const Content = styled.div`
   margin-top: 60px;
-  margin-left: ${({ isExpanded }) => (isExpanded ? '250px' : '80px')}; 
+  margin-left: ${({ $isExpanded }) => ($isExpanded ? '250px' : '80px')}; 
   padding: 20px;
   transition: margin-left 0.3s ease;
 
   @media (max-width: 768px) {
-    margin-left: ${({ isExpanded }) => (isExpanded ? '250px' : '80px')};
+    margin-left: ${({ $isExpanded }) => ($isExpanded ? '250px' : '80px')};
     padding: 15px;
   }
 
@@ -62,7 +62,7 @@ function App() {
             <Header theme={theme} toggleTheme={toggleTheme} restaurantName="Burger place"/>
             <Sidebar isExpanded={isSidebarExpanded} toggleSidebar={() => setSidebarExpanded(!isSidebarExpanded)}/>
 
-            <Content isExpanded={isSidebarExpanded}>
+            <Content $isExpanded={isSidebarExpanded}>
               <Routes>
                 
                 <Route exact path="/" element={<Dashboard />} />

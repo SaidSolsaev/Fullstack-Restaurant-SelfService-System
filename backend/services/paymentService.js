@@ -72,8 +72,6 @@ export const initiatePayment = async(phoneNumber, amount, orderId) => {
             }
         );
 
-       
-
         return {
             url: response.data.url,
             orderId: orderId

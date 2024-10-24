@@ -6,27 +6,12 @@ import styled from 'styled-components';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
-const ChartRow = styled.div`
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    width: 100%;
-    align-items: center;
-    margin: 0 auto;
-    gap: 20px;
-
-    @media (max-width: 768px) {
-        flex-direction: column;
-    }
-`;
 
 const ChartWrapper = styled.div`
     border-radius: 10px;
-
-    canvas{
-        width: 100%;
-        height: 500px;
-    }
+    width: 100%;
+    height: 400px;
+    padding: 10px;
 `;
 
 const MonthlyOrdersChart = () => {
@@ -91,6 +76,7 @@ const MonthlyOrdersChart = () => {
 
     const chartOptions = {
         responsive: true,
+        maintainAspectRatio: false,
         plugins: {
             legend: {
                 position: 'top',
@@ -107,15 +93,17 @@ const MonthlyOrdersChart = () => {
         },
     };
 
+   
+
     return (
-        <ChartRow>
-            <ChartWrapper>
-                <Bar 
-                    data={ordersChartData} 
-                    options={chartOptions}
-                />
-            </ChartWrapper>
-        </ChartRow>
+        
+        <ChartWrapper>
+            <Bar
+                data={ordersChartData} 
+                options={chartOptions}
+            />
+        </ChartWrapper>
+        
     );
 };
 
