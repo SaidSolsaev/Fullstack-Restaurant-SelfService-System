@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchOrders } from '../../redux/slices/orderSlice'
 import styled from 'styled-components';
-import { FaMoneyBillAlt } from "react-icons/fa";
 import { AiOutlineShoppingCart } from 'react-icons/ai';
 import { FaListAlt, FaDollarSign, FaTruck } from 'react-icons/fa';
 import { MdCancel } from 'react-icons/md';
