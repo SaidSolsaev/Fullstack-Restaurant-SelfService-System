@@ -41,6 +41,10 @@ const StyledTable = styled.table`
         color: ${({ theme }) => theme.text};
     }
 
+    td:last-child, th:last-child {
+        text-align: end;
+    }
+
     tbody {
        
         tr:hover {

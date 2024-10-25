@@ -39,7 +39,7 @@ const Orders = () => {
     dispatch(fetchOrders());
   }, [dispatch]);
 
-  if (loading) return <p>loading...</p>
+  if (loading) return <p>Loading...</p>
   if (error) return <p>Error: {error}</p>
 
   return (

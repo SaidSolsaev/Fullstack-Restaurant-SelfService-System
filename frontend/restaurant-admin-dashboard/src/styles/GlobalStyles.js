@@ -41,6 +41,12 @@ export const GlobalStyles = createGlobalStyle`
         color: ${({ theme }) => theme.secondaryText};
     }
 
+    .row {
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
+    }
+
     /* Container */
     .container {
         max-width: 1200px;
@@ -59,6 +65,33 @@ export const GlobalStyles = createGlobalStyle`
             padding: 5px;
         }
     }
+
+    .grid-container{
+        display: flex;
+        flex-warp: wrap;
+        gap: 10px;
+
+        .xl-card {
+            flex: 0 0 auto;
+            width: 100%;
+        }
+
+        .l-card {
+            flex: 0 0 auto;
+            width: 75%;
+        }
+
+        .m-card {
+            flex: 0 0 auto;
+            width: 50%;
+        }
+
+        .sm-card {
+            flex: 0 0 auto;
+            width: 25%;
+        }
+    }
+
 
     /* Buttons */
     button {

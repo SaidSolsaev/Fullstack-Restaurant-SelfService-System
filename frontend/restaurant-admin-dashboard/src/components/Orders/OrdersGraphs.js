@@ -28,22 +28,21 @@ const FilterButtons = styled.div`
     margin: 20px 0;
     justify-content: center;
 
-    button {
-        background-color: ${({ theme }) => theme.primaryButton};
-        color: ${({ theme }) => theme.primaryButtonText};
-        padding: 8px 12px;
+    span {
         border: none;
+        margin: 0 10px;
         border-radius: 5px;
         cursor: pointer;
         font-size: 1rem;
 
         &:hover {
-            background-color: ${({ theme }) => theme.primaryButtonHover};
+            color: ${({theme}) => theme.textHover};
         }
 
         &.active {
             font-weight: bold;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+            color: ${({theme}) => theme.textHover};
+            
         }
     }
 `;
@@ -111,7 +110,6 @@ const OrdersGraphs = ({orders}) => {
                 borderColor: '#3498db',
                 backgroundColor: 'rgba(52, 152, 219, 0.5)',
                 borderWidth: 2,
-                fill: true,
             },
         ],
       };
@@ -134,9 +132,9 @@ const OrdersGraphs = ({orders}) => {
             </GraphsContainer>
 
             <FilterButtons>
-                <button onClick={() => setView('daily')} className={view === 'daily' ? 'active' : ''}>Daily</button>
-                <button onClick={() => setView('weekly')} className={view === 'weekly' ? 'active' : ''}>Weekly</button>
-                <button onClick={() => setView('monthly')} className={view === 'monthly' ? 'active' : ''}>Monthly</button>
+                <span onClick={() => setView('daily')} className={view === 'daily' ? 'active' : ''}>Daily</span>
+                <span onClick={() => setView('weekly')} className={view === 'weekly' ? 'active' : ''}>Weekly</span>
+                <span onClick={() => setView('monthly')} className={view === 'monthly' ? 'active' : ''}>Monthly</span>
             </FilterButtons>
 
             <h3>Average Order Value: ${filteredData.avgOrderValue}</h3>
