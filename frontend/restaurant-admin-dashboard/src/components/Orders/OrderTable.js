@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import styled from 'styled-components';
+import { FaEye } from "react-icons/fa";
 
 const TableWrapper = styled.div`
     margin: 20px 0;
@@ -8,7 +9,6 @@ const TableWrapper = styled.div`
     border-radius: 10px;
     box-shadow: ${({ theme }) => theme.boxShadow};
     overflow-x: auto;
-    // width: 50%;
 `;
 
 
@@ -16,6 +16,7 @@ const StyledTable = styled.table`
     width: 100%;
     border-collapse: collapse;
     text-align: left;
+    
 
     th, td {
         padding: 15px;
@@ -23,42 +24,37 @@ const StyledTable = styled.table`
     }
 
     th {
-        background-color: ${({ theme }) => theme.tableHeaderBackground};
-        color: ${({ theme }) => theme.textLight};
+        color: ${({theme}) => theme.secondaryText};
     }
 
     td {
         color: ${({ theme }) => theme.text};
     }
 
-    tr:hover {
-        background-color: ${({ theme }) => theme.hoverBackground};
+    tbody {
+       
+        tr:hover {
+            background-color: ${({ theme }) => theme.hoverBackground};
+            cursor: pointer;
+        }
     }
 `;
 
 const ButtonWrapper = styled.div`
     display: flex;
     justify-content: center;
-    margin-top: 15px;
+    margin-top: 30px;
 
-    button {
-        padding: 10px 20px;
-        background-color: ${({ theme }) => theme.primaryButton};
-        color: ${({ theme }) => theme.buttonText};
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 1rem;
-        transition: background-color 0.3s ease;
+    span {
+        cursor: pointer;        
+        font-weight: bold;
 
         &:hover {
-            background-color: ${({ theme }) => theme.primaryButtonHover};
-        }
-
-        @media (max-width: 768px) {
-            width: 100%;
+            text-decoration: underline;
+            color: ${({ theme }) => theme.primaryButtonHover};
         }
     }
+
 `;
 
 
@@ -68,8 +64,6 @@ const OrderTable = ({orders}) => {
     const displayedOrders = showAll ? orders : orders.slice(0, 5);
 
     const toggleViewAll = () => setShowAll(!showAll);
-
-    console.log(showAll)
     
     return (
         <TableWrapper>
@@ -96,7 +90,7 @@ const OrderTable = ({orders}) => {
                                 <td>{new Date(order.createdAt).toLocaleDateString()}</td>
                                 <td>{order.status}</td>
                                 <td>${order.totalAmount}</td>
-                                <td><button>View</button></td>
+                                <td><FaEye /></td>
                             </tr>
                         ))
                     ) : (
@@ -109,9 +103,9 @@ const OrderTable = ({orders}) => {
             
             {orders.length > 5 && (
                 <ButtonWrapper>
-                    <button onClick={toggleViewAll}>
+                    <span onClick={toggleViewAll}>
                         {showAll ? 'Show Less' : 'View All'}
-                    </button>
+                    </span>
                 </ButtonWrapper>
             )}
         </TableWrapper>

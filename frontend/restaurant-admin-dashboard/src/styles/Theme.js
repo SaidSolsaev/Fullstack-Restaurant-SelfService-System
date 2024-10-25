@@ -27,7 +27,10 @@ export const lightTheme = {
   borderColor: '#dddddd',
 
   // Shadows
-  boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)', 
+  boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)',
+
+  // Hover
+  hoverBackground: '#f1f1f1', 
 };
 
 
@@ -60,6 +63,9 @@ export const darkTheme = {
   borderColor: '#444455',
 
   // Shadows
-  boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.4)', 
+  boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.4)',
+
+  // Hover
+  hoverBackground: '#3d3d4d',
 };
   
