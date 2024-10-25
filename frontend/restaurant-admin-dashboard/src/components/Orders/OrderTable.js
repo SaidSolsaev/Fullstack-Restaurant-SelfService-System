@@ -1,14 +1,25 @@
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
 import styled from 'styled-components';
 import { FaEye } from "react-icons/fa";
 
 const TableWrapper = styled.div`
-    margin: 20px 0;
     padding: 20px;
     background-color: ${({ theme }) => theme.cardBackground};
     border-radius: 10px;
     box-shadow: ${({ theme }) => theme.boxShadow};
     overflow-x: auto;
+    max-height: 400px;
+    width: 100%;
+
+    @media (max-width: 768px) {
+        padding: 15px;
+        margin: 15px 0;
+    }
+
+    @media (max-width: 480px) {
+        padding: 10px;
+        margin: 10px 0;
+    }
 `;
 
 
@@ -17,7 +28,6 @@ const StyledTable = styled.table`
     border-collapse: collapse;
     text-align: left;
     
-
     th, td {
         padding: 15px;
         border-bottom: 1px solid ${({ theme }) => theme.borderColor};
@@ -38,6 +48,20 @@ const StyledTable = styled.table`
             cursor: pointer;
         }
     }
+
+    @media (max-width: 768px) {
+        th, td {
+            padding: 10px;
+            font-size: 0.9rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        th, td {
+            padding: 8px;
+            font-size: 0.8rem;
+        }
+    }
 `;
 
 const ButtonWrapper = styled.div`
@@ -54,15 +78,17 @@ const ButtonWrapper = styled.div`
             color: ${({ theme }) => theme.primaryButtonHover};
         }
     }
-
 `;
 
 
 const OrderTable = ({orders}) => {
     const [showAll, setShowAll] = useState(false);
 
-    const displayedOrders = showAll ? orders : orders.slice(0, 5);
-
+    const displayedOrders = useMemo(() => {
+        const sortedOrders = orders.slice().sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        return showAll ? sortedOrders : sortedOrders.slice(0, 5);
+    }, [orders, showAll]);
+    
     const toggleViewAll = () => setShowAll(!showAll);
     
     return (
@@ -81,8 +107,6 @@ const OrderTable = ({orders}) => {
                 <tbody>
                     {displayedOrders.length > 0 ? (
                         displayedOrders
-                        .slice()
-                        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
                         .map((order) => (
                             <tr key={order.id}>
                                 <td>{order.orderNumber}</td>

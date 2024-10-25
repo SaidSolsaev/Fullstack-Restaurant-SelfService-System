@@ -61,7 +61,7 @@ const OrderStats = () => {
     const currentMonth = new Date().getMonth();
     const currentYear = new Date().getFullYear();
 
-    const { totalOrdersThisMonth, totalOrdersLastMonth, totalOrdersAllTime, avgIncomePerOrder, totalIncomeThisMonth, totalIncomeLastMonth, incomeDifference } = useMemo(() => {
+    const { totalOrdersThisMonth, totalOrdersLastMonth, avgIncomePerOrder, totalIncomeThisMonth, totalIncomeLastMonth, incomeDifference } = useMemo(() => {
         let totalOrdersThisMonth = 0;
         let totalOrdersLastMonth = 0;
         let totalOrdersAllTime = 0;
