@@ -71,6 +71,7 @@ export const GlobalStyles = createGlobalStyle`
         flex-warp: wrap;
         gap: 10px;
 
+    }
         .xl-card {
             flex: 0 0 auto;
             width: 100%;
@@ -90,7 +91,6 @@ export const GlobalStyles = createGlobalStyle`
             flex: 0 0 auto;
             width: 25%;
         }
-    }
 
 
     /* Buttons */

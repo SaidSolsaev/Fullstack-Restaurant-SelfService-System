@@ -1,4 +1,5 @@
 import Category from '../models/category.js';
+import MenuItem from "../models/menuItem.js";
 
 export const getCategoryById = async (req, res, next) => {
     const { id } = req.params;
@@ -21,7 +22,14 @@ export const getAllCategories = async (req, res, next) => {
     const restaurantId = req.user.restaurantId || req.headers['restaurant-id'];
 
     try {
-        const categories = await Category.findAll({where: {restaurantId}});
+        const categories = await Category.findAll({
+            where: {restaurantId},
+            include: [
+                {
+                    model: MenuItem
+                }
+            ]
+        });
         res.status(200).json(categories);
     } catch (error) {
         next(error)
