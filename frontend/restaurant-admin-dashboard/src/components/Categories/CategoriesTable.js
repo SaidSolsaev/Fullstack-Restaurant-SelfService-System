@@ -6,6 +6,14 @@ import { FaEdit, FaTrashAlt } from 'react-icons/fa';
 const TableWrapper = styled.div`
     width: 400px;
     overflow-x: auto;
+
+    @media (max-width: 768px) {
+        width: 100%;
+
+        th:last-child, td:last-child {
+            text-align: end;
+        }
+    }
 `;
 
 const StyledTable = styled.table`
@@ -14,12 +22,8 @@ const StyledTable = styled.table`
     text-align: left;
     th, td {
         padding: 15px;
-        border-bottom: 1px solid ${({ theme }) => theme.borderColor};
-        // width: 33%;
+        border-bottom: 1px solid ${({ theme }) => theme.borderColor};        
         
-        &:last-child{
-            // text-align: right;
-        }
     }
     th {
         font-weight: bold;
@@ -52,31 +56,31 @@ const CategoriesTable = ({categories, onEdit, onDelete}) => {
     
     return (
         <TableWrapper>
-        <StyledTable>
-            <thead>
-                <tr>
-                    <th>Category Name</th>
-                    <th>Items</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {categories.map((category) => (
-                    <tr key={category.id}>
-                        <td>{category.name}</td>
-                        <td>{category.MenuItems?.length}</td>
-                        <td>
-                            <ActionButton color="#4CAF50" onClick={() => onEdit(category)}>
-                                <FaEdit />
-                            </ActionButton>
-                            <ActionButton color="#e74c3c" onClick={() => onDelete(category.id)}>
-                                <FaTrashAlt />
-                            </ActionButton>
-                        </td>
+            <StyledTable>
+                <thead>
+                    <tr>
+                        <th>Category Name</th>
+                        <th>Items</th>
+                        <th>Actions</th>
                     </tr>
-                ))}
-            </tbody>
-        </StyledTable>
+                </thead>
+                <tbody>
+                    {categories.map((category) => (
+                        <tr key={category.id}>
+                            <td>{category.name}</td>
+                            <td>{category.MenuItems?.length}</td>
+                            <td>
+                                <ActionButton color="#4CAF50" onClick={() => onEdit(category)}>
+                                    <FaEdit />
+                                </ActionButton>
+                                <ActionButton color="#e74c3c" onClick={() => onDelete(category.id)}>
+                                    <FaTrashAlt />
+                                </ActionButton>
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </StyledTable>
     </TableWrapper>
     )
 }

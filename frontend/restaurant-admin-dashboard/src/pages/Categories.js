@@ -12,7 +12,10 @@ const CategoriesContainer = styled.div`
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
-    
+
+    @media (max-width: 768px) {
+      flex-direction: row;
+    }
   }
 
   .header-content{

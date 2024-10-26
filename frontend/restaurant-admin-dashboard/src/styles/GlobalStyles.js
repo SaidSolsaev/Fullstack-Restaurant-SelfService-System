@@ -45,6 +45,10 @@ export const GlobalStyles = createGlobalStyle`
         display: flex;
         flex-direction: row;
         gap: 10px;
+
+        @media (max-width: 768px) {
+            flex-direction: column;
+        }
     }
 
     /* Container */
